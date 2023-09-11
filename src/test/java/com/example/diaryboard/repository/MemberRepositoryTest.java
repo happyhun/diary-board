@@ -24,12 +24,12 @@ class MemberRepositoryTest {
     @Test
     void 회원_생성_조회() {
         // given
-        String name = "임시완";
+        String nickname = "임시완";
         String email = "test@gmail.com";
         String password = "test123!@#";
 
         Member member = Member.builder()
-                .name(name)
+                .nickname(nickname)
                 .email(email)
                 .password(password)
                 .build();
@@ -40,7 +40,7 @@ class MemberRepositoryTest {
 
         // then
         assertThat(findMember).isNotEmpty();
-        assertThat(findMember.get().getName()).isEqualTo(member.getName());
+        assertThat(findMember.get().getNickname()).isEqualTo(member.getNickname());
         assertThat(findMember.get().getEmail()).isEqualTo(member.getEmail());
         assertThat(findMember.get().getPassword()).isEqualTo(member.getPassword());
     }
@@ -48,12 +48,12 @@ class MemberRepositoryTest {
     @Test
     void 회원_생성_삭제() {
         // given
-        String name = "임시완";
+        String nickname = "임시완";
         String email = "test@gmail.com";
         String password = "test123!@#";
 
         Member member = Member.builder()
-                .name(name)
+                .nickname(nickname)
                 .email(email)
                 .password(password)
                 .build();

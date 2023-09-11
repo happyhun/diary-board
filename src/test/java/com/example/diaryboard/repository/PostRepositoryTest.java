@@ -26,7 +26,7 @@ class PostRepositoryTest {
     @BeforeEach
     void beforeEach() {
         Member member = Member.builder()
-                .name("임시완")
+                .nickname("임시완")
                 .email("test@gmail.com")
                 .password("test123!@#")
                 .build();
