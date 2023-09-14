@@ -5,6 +5,7 @@ import com.example.diaryboard.dto.LoginResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.dto.SignupResponse;
 import com.example.diaryboard.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<SignupResponse> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<SignupResponse> signup(@RequestBody @Valid SignupRequest request) {
         memberService.signup(request);
         SignupResponse response = new SignupResponse("회원가입 성공");
 
@@ -28,7 +29,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse response = memberService.login(request);
 
         return ResponseEntity.ok().body(response);

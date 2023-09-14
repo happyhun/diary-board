@@ -32,8 +32,7 @@ public class JwtProvider {
         try {
             signer = new MACSigner(secretKey);
         } catch (KeyLengthException e) {
-            System.out.println(secretKey);
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -49,7 +48,7 @@ public class JwtProvider {
         try {
             signedJWT.sign(signer);
         } catch (JOSEException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         return signedJWT.serialize();
