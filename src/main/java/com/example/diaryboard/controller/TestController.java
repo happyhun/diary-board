@@ -23,8 +23,8 @@ public class TestController {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    @GetMapping("/token")
-    public String generateToken() throws Exception {
-        return jwtProvider.generateAccessToken(Collections.singletonMap("member_id", "1"), Duration.ofMinutes(5));
-    }
+//    @GetMapping("/token")
+//    public String generateToken() throws Exception {
+//        return jwtProvider.generateAccessToken(Collections.singletonMap("member_id", "1"), Duration.ofMinutes(5));
+//    }
 }
