@@ -1,10 +1,10 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.config.jwt.JwtProvider;
 import com.example.diaryboard.dto.LoginRequest;
 import com.example.diaryboard.dto.LoginResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.entity.Member;
+import com.example.diaryboard.global.jwt.JwtProvider;
 import com.example.diaryboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

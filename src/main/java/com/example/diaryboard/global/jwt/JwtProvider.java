@@ -1,4 +1,4 @@
-package com.example.diaryboard.config.jwt;
+package com.example.diaryboard.global.jwt;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;

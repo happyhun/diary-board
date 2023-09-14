@@ -26,7 +26,7 @@ public class Message {
     private Member receiver;
 
     private String content;
-    
+
     @CreatedDate
     private LocalDateTime sentAt;
 

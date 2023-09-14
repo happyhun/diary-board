@@ -86,7 +86,7 @@ class MemberServiceTest {
 
         // when
         Long memberId = memberService.signup(dto);
-        LoginResponse response= memberService.login(new LoginRequest(email, password));
+        LoginResponse response = memberService.login(new LoginRequest(email, password));
         Jwt accessToken = jwtDecoder.decode(response.getAccessToken());
         Jwt refreshToken = jwtDecoder.decode(response.getRefreshToken());
 
