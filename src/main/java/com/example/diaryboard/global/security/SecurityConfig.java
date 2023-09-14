@@ -28,12 +28,13 @@ public class SecurityConfig {
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.authorizeHttpRequests(request -> request
+        http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/members", "/members/login").permitAll()
                 .anyRequest().authenticated()
         );
 
         http.oauth2ResourceServer(oauth2 -> oauth2
+                .authenticationEntryPoint(new OAuth2AuthenticationEntryPoint())
                 .jwt(jwt -> new JwtAuthenticationConverter())
         );
 

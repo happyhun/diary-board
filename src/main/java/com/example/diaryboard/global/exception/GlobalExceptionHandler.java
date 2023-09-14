@@ -10,6 +10,12 @@ import static com.example.diaryboard.global.exception.ExceptionCode.INVALID_JSON
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        ErrorResponse response = new ErrorResponse(e.getExceptionCode().getCode(), e.getMessage(), e.getDetailMessage());
+        return ResponseEntity.status(e.getExceptionCode().getStatus()).body(response);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String detailMessage = e.getFieldError().getDefaultMessage();
@@ -19,11 +25,5 @@ public class GlobalExceptionHandler {
         CustomException ce = new CustomException(INVALID_JSON_FORMAT, detailMessage);
         ErrorResponse response = new ErrorResponse(ce.getExceptionCode().getCode(), ce.getMessage(), ce.getDetailMessage());
         return ResponseEntity.status(ce.getExceptionCode().getStatus()).body(response);
-    }
-
-    @ExceptionHandler(CustomException.class)
-    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        ErrorResponse response = new ErrorResponse(e.getExceptionCode().getCode(), e.getMessage(), e.getDetailMessage());
-        return ResponseEntity.status(e.getExceptionCode().getStatus()).body(response);
     }
 }
