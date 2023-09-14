@@ -5,7 +5,6 @@ import com.example.diaryboard.dto.LoginResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
-import com.example.diaryboard.global.exception.ExceptionCode;
 import com.example.diaryboard.global.jwt.JwtProvider;
 import com.example.diaryboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
