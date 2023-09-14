@@ -1,0 +1,20 @@
+package com.example.diaryboard.global.exception;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
+
+@Getter
+@RequiredArgsConstructor
+public enum ExceptionCode {
+    INVALID_JSON_FORMAT(BAD_REQUEST, "JSON_001", "잘못된 JSON 요청입니다"),
+    DUPLICATED_EMAIL(CONFLICT, "MEMBER_001", "중복된 이메일입니다"),
+    DUPLICATED_NICKNAME(CONFLICT, "MEMBER_002", "중복된 닉네임입니다"),
+    UNAUTHORIZED_LOGIN(UNAUTHORIZED, "MEMBER_003", "잘못된 로그인 요청입니다");
+
+    private final HttpStatus status;
+    private final String code;
+    private final String message;
+}
