@@ -1,5 +1,7 @@
 package com.example.diaryboard.service;
 
+import com.example.diaryboard.dto.LoginRequest;
+import com.example.diaryboard.dto.LoginResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.repository.MemberRepository;
@@ -8,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import java.util.Optional;
 
@@ -25,6 +29,9 @@ class MemberServiceTest {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    JwtDecoder jwtDecoder;
 
     @AfterEach
     void afterEach() {
@@ -66,5 +73,25 @@ class MemberServiceTest {
 
         // then
         assertThatThrownBy(() -> memberService.signup(dto2)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void 로그인() {
+        // given
+        String nickname = "임시완";
+        String email = "test@gmail.com";
+        String password = "test123!@#";
+
+        SignupRequest dto = new SignupRequest(email, password, nickname);
+
+        // when
+        Long memberId = memberService.signup(dto);
+        LoginResponse response= memberService.login(new LoginRequest(email, password));
+        Jwt accessToken = jwtDecoder.decode(response.getAccessToken());
+        Jwt refreshToken = jwtDecoder.decode(response.getRefreshToken());
+
+        // then
+        assertThat(accessToken.getSubject()).isEqualTo(String.valueOf(memberId));
+        assertThat(refreshToken.getSubject()).isEqualTo(String.valueOf(memberId));
     }
 }
