@@ -2,8 +2,10 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.LoginRequest;
 import com.example.diaryboard.dto.LoginResponse;
+import com.example.diaryboard.dto.ReissueResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.entity.Member;
+import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +74,7 @@ class MemberServiceTest {
         memberService.signup(dto1);
 
         // then
-        assertThatThrownBy(() -> memberService.signup(dto2)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> memberService.signup(dto2)).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -93,5 +95,28 @@ class MemberServiceTest {
         // then
         assertThat(accessToken.getSubject()).isEqualTo(String.valueOf(memberId));
         assertThat(refreshToken.getSubject()).isEqualTo(String.valueOf(memberId));
+    }
+
+    @Test
+    void 엑세스_토큰_재발급() {
+        // given
+        String nickname = "임시완";
+        String email = "test@gmail.com";
+        String password = "test123!@#";
+
+        SignupRequest dto = new SignupRequest(email, password, nickname);
+
+        // when
+        Long memberId = memberService.signup(dto);
+
+        LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+        Jwt accessToken = jwtDecoder.decode(loginResponse.getAccessToken());
+
+        ReissueResponse reissueResponse = memberService.reissue(loginResponse.getRefreshToken());
+        Jwt reissuedAccessToken = jwtDecoder.decode(reissueResponse.getAccessToken());
+
+        // then
+        assertThat(reissuedAccessToken.getSubject()).isEqualTo(accessToken.getSubject());
+        assertThatThrownBy(() -> memberService.reissue(loginResponse.getAccessToken())).isInstanceOf(CustomException.class);
     }
 }

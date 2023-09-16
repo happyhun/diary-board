@@ -9,25 +9,26 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
+import static com.example.diaryboard.global.jwt.JwtConfig.*;
+
 public class JwtProvider {
 
     private final String secretKey;
-    private final Duration EXP_ACCESS = Duration.ofMinutes(30);
-    private final Duration EXP_REFRESH = Duration.ofDays(30);
+
 
     public JwtProvider(String secretKey) {
         this.secretKey = secretKey;
     }
 
     public String generateAccessToken(String subject) {
-        return generateToken(subject, EXP_ACCESS);
+        return generateToken(subject, EXP_ACCESS, SCOPE_ACCESS);
     }
 
     public String generateRefreshToken(String subject) {
-        return generateToken(subject, EXP_REFRESH);
+        return generateToken(subject, EXP_REFRESH, SCOPE_REFRESH);
     }
 
-    private String generateToken(String subject, Duration expirationTime) {
+    private String generateToken(String subject, Duration expirationTime, String scope) {
         JWSSigner signer;
         try {
             signer = new MACSigner(secretKey);
@@ -39,6 +40,7 @@ public class JwtProvider {
                 .subject(subject)
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plus(expirationTime)))
+                .claim("scp", scope)
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.HS256)
