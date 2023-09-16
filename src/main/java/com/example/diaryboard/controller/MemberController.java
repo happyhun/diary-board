@@ -1,12 +1,10 @@
 package com.example.diaryboard.controller;
 
-import com.example.diaryboard.dto.LoginRequest;
-import com.example.diaryboard.dto.LoginResponse;
-import com.example.diaryboard.dto.SignupRequest;
-import com.example.diaryboard.dto.SignupResponse;
+import com.example.diaryboard.dto.*;
 import com.example.diaryboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,5 +35,13 @@ public class MemberController {
     @GetMapping
     public Authentication test() {
         return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    @GetMapping("/reissue")
+    public ResponseEntity<ReissueResponse> reissue(@RequestHeader("authorization") String refreshToken){
+        refreshToken = refreshToken.replace("Bearer ", "");
+        ReissueResponse response = memberService.reissue(refreshToken);
+
+        return ResponseEntity.ok().body(response);
     }
 }

@@ -2,6 +2,7 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.LoginRequest;
 import com.example.diaryboard.dto.LoginResponse;
+import com.example.diaryboard.dto.ReissueResponse;
 import com.example.diaryboard.dto.SignupRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
@@ -9,12 +10,15 @@ import com.example.diaryboard.global.jwt.JwtProvider;
 import com.example.diaryboard.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
+import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_REFRESH;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final JwtDecoder jwtDecoder;
 
     public Long signup(SignupRequest dto) {
         if (memberRepository.existsByEmail(dto.getEmail()))
@@ -55,5 +60,22 @@ public class MemberService {
         String refreshToken = jwtProvider.generateRefreshToken(subject);
 
         return new LoginResponse(accessToken, refreshToken);
+    }
+
+    public ReissueResponse reissue(String refreshToken) {
+        System.out.println(refreshToken);
+        Jwt jwt = jwtDecoder.decode(refreshToken);
+
+        if (!jwt.getClaim("scp").equals(SCOPE_REFRESH))
+            throw new CustomException(INVALID_TOKEN, "refresh token이 아닙니다");
+
+        String subject = jwt.getSubject();
+        Long memberId = Long.valueOf(subject);
+
+        if (!memberRepository.existsById(memberId))
+            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
+
+        String accessToken = jwtProvider.generateAccessToken(subject);
+        return new ReissueResponse(accessToken);
     }
 }

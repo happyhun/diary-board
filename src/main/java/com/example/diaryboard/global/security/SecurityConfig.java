@@ -30,6 +30,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/members", "/members/login").permitAll()
+                .requestMatchers("/reissue").hasAuthority("SCOPE_REFRESH")
                 .anyRequest().authenticated()
         );
 

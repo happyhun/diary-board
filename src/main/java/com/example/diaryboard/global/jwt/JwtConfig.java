@@ -10,10 +10,16 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 
 @Configuration
 public class JwtConfig {
+
+    public static final Duration EXP_ACCESS = Duration.ofMinutes(30);
+    public static Duration EXP_REFRESH = Duration.ofDays(30);
+    public static final String SCOPE_ACCESS = "ACCESS";
+    public static final String SCOPE_REFRESH = "REFRESH";
 
     @Value("${jwt.secret-key}")
     private String secretKey;
