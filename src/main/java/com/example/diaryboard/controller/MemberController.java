@@ -4,10 +4,7 @@ import com.example.diaryboard.dto.*;
 import com.example.diaryboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,15 +29,18 @@ public class MemberController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping
-    public Authentication test() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
-
     @GetMapping("/reissue")
-    public ResponseEntity<ReissueResponse> reissue(@RequestHeader("authorization") String refreshToken){
+    public ResponseEntity<ReissueResponse> reissue(@RequestHeader("authorization") String refreshToken) {
         refreshToken = refreshToken.replace("Bearer ", "");
         ReissueResponse response = memberService.reissue(refreshToken);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<MemberProfile> getMemberProfile(@RequestHeader("authorization") String accessToken) {
+        accessToken = accessToken.replace("Bearer ", "");
+        MemberProfile response = memberService.getMemberProfile(accessToken);
 
         return ResponseEntity.ok().body(response);
     }

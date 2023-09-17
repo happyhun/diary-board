@@ -1,9 +1,6 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.dto.LoginRequest;
-import com.example.diaryboard.dto.LoginResponse;
-import com.example.diaryboard.dto.ReissueResponse;
-import com.example.diaryboard.dto.SignupRequest;
+import com.example.diaryboard.dto.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.repository.MemberRepository;
@@ -118,5 +115,24 @@ class MemberServiceTest {
         // then
         assertThat(reissuedAccessToken.getSubject()).isEqualTo(accessToken.getSubject());
         assertThatThrownBy(() -> memberService.reissue(loginResponse.getAccessToken())).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void 회원정보_조회() {
+        // given
+        String nickname = "임시완";
+        String email = "test@gmail.com";
+        String password = "test123!@#";
+
+        SignupRequest dto = new SignupRequest(email, password, nickname);
+
+        // when
+        memberService.signup(dto);
+        LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+        MemberProfile memberProfile = memberService.getMemberProfile(loginResponse.getAccessToken());
+
+        // then
+        assertThat(memberProfile.getNickname()).isEqualTo(dto.getNickname());
+        assertThatThrownBy(() -> memberService.getMemberProfile(loginResponse.getRefreshToken())).isInstanceOf(CustomException.class);
     }
 }
