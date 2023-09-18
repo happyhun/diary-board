@@ -129,10 +129,32 @@ class MemberServiceTest {
         // when
         memberService.signup(dto);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
-        MemberProfile memberProfile = memberService.getMemberProfile(loginResponse.getAccessToken());
+
+        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile(loginResponse.getAccessToken());
 
         // then
-        assertThat(memberProfile.getNickname()).isEqualTo(dto.getNickname());
+        assertThat(memberProfileResponse.getNickname()).isEqualTo(dto.getNickname());
         assertThatThrownBy(() -> memberService.getMemberProfile(loginResponse.getRefreshToken())).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void 닉네임_변경() {
+        // given
+        String nickname = "임시완";
+        String changedNickname = "바뀐 임시완";
+        String email = "test@gmail.com";
+        String password = "test123!@#";
+
+        SignupRequest signupRequest = new SignupRequest(email, password, nickname);
+        ChangeNicknameRequest  changeNicknameRequest = new ChangeNicknameRequest(changedNickname);
+        // when
+        memberService.signup(signupRequest);
+        LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+
+        memberService.changeNickname(loginResponse.getAccessToken(), changeNicknameRequest);
+        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile(loginResponse.getAccessToken());
+
+        // then
+        assertThat(memberProfileResponse.getNickname()).isEqualTo(changeNicknameRequest.getNickname());
     }
 }

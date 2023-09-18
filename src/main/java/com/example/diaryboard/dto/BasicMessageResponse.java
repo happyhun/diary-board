@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class SignupResponse {
+public class BasicMessageResponse {
 
     private String message;
 }
