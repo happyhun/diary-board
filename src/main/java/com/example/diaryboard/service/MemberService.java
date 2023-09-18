@@ -1,9 +1,6 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.dto.LoginRequest;
-import com.example.diaryboard.dto.LoginResponse;
-import com.example.diaryboard.dto.ReissueResponse;
-import com.example.diaryboard.dto.SignupRequest;
+import com.example.diaryboard.dto.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.global.jwt.JwtProvider;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
+import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_ACCESS;
 import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_REFRESH;
 
 @Service
@@ -63,7 +61,6 @@ public class MemberService {
     }
 
     public ReissueResponse reissue(String refreshToken) {
-        System.out.println(refreshToken);
         Jwt jwt = jwtDecoder.decode(refreshToken);
 
         if (!jwt.getClaim("scp").equals(SCOPE_REFRESH))
@@ -77,5 +74,39 @@ public class MemberService {
 
         String accessToken = jwtProvider.generateAccessToken(subject);
         return new ReissueResponse(accessToken);
+    }
+
+    public MemberProfileResponse getMemberProfile(String accessToken) {
+        Jwt jwt = jwtDecoder.decode(accessToken);
+
+        if (!jwt.getClaim("scp").equals(SCOPE_ACCESS))
+            throw new CustomException(INVALID_TOKEN, "access token이 아닙니다");
+
+        String subject = jwt.getSubject();
+        Long memberId = Long.valueOf(subject);
+
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty())
+            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
+
+        return new MemberProfileResponse(member.get().getNickname());
+    }
+
+    public Long changeNickname(String accessToken, ChangeNicknameRequest request) {
+        Jwt jwt = jwtDecoder.decode(accessToken);
+
+        if (!jwt.getClaim("scp").equals(SCOPE_ACCESS))
+            throw new CustomException(INVALID_TOKEN, "access token이 아닙니다");
+
+        String subject = jwt.getSubject();
+        Long memberId = Long.valueOf(subject);
+
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty())
+            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
+
+        member.get().changeNickname(request.getNickname());
+
+        return memberId;
     }
 }

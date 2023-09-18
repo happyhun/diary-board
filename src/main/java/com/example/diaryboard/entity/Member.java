@@ -20,4 +20,8 @@ public class Member {
     private String email;
     private String password;
     private String nickname;
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
