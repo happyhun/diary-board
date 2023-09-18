@@ -45,7 +45,7 @@ public class MemberController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PutMapping
+    @PatchMapping
     public ResponseEntity<BasicMessageResponse> changeNickname(@RequestHeader("authorization") String accessToken,
                                                                 @RequestBody ChangeNicknameRequest request) {
         accessToken = accessToken.replace("Bearer ", "");
