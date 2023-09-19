@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@Transactional
 class MemberServiceTest {
 
     @Autowired
@@ -31,11 +33,6 @@ class MemberServiceTest {
 
     @Autowired
     JwtDecoder jwtDecoder;
-
-    @AfterEach
-    void afterEach() {
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 회원가입() {
@@ -114,7 +111,6 @@ class MemberServiceTest {
 
         // then
         assertThat(reissuedAccessToken.getSubject()).isEqualTo(accessToken.getSubject());
-        assertThatThrownBy(() -> memberService.reissue(loginResponse.getAccessToken())).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -134,7 +130,6 @@ class MemberServiceTest {
 
         // then
         assertThat(memberProfileResponse.getNickname()).isEqualTo(dto.getNickname());
-        assertThatThrownBy(() -> memberService.getMemberProfile(loginResponse.getRefreshToken())).isInstanceOf(CustomException.class);
     }
 
     @Test

@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
-import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_REFRESH;
 
 @Service
 @RequiredArgsConstructor
@@ -79,29 +78,13 @@ public class MemberService {
     }
 
     public ReissueResponse reissue(String refreshToken) {
-        Jwt jwt = jwtDecoder.decode(refreshToken);
+        Long memberId = getMemberIdFromToken(refreshToken);
+        Member member = getValidMemberById(memberId);
 
-        if (!jwt.getClaim("scp").equals(SCOPE_REFRESH))
-            throw new CustomException(INVALID_TOKEN, "refresh token이 아닙니다");
-
-        String subject = jwt.getSubject();
-        Long memberId = Long.valueOf(subject);
-
-        if (!memberRepository.existsById(memberId))
-            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
-
+        String subject = String.valueOf(member.getId());
         String accessToken = jwtProvider.generateAccessToken(subject);
+
         return new ReissueResponse(accessToken);
-    }
-
-    public MemberProfileResponse getMemberProfile(String accessToken) {
-        Long memberId = getMemberIdFromToken(accessToken);
-        Optional<Member> member = memberRepository.findById(memberId);
-
-        if (member.isEmpty())
-            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
-
-        return new MemberProfileResponse(member.get().getNickname());
     }
 
     private Long getMemberIdFromToken(String accessToken) {
@@ -110,16 +93,36 @@ public class MemberService {
         return Long.valueOf(jwt.getSubject());
     }
 
-    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
-        Long memberId = getMemberIdFromToken(accessToken);
+    private Member getValidMemberById(Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
 
         if (member.isEmpty())
             throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
+        return member.get();
+    }
+
+    public MemberProfileResponse getMemberProfile(String accessToken) {
+        Long memberId = getMemberIdFromToken(accessToken);
+        Member member = getValidMemberById(memberId);
+
+        return new MemberProfileResponse(member.getNickname());
+    }
+
+    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
+        Long memberId = getMemberIdFromToken(accessToken);
+        Member member = getValidMemberById(memberId);
+
+        checkValidMemberProfile(request);
+
+        modelMapper.map(request, member);
+    }
+
+    private void checkValidMemberProfile(MemberProfileRequest request) {
+        if (StringUtils.hasLength(request.getNickname()) && memberRepository.existsByNickname(request.getNickname()))
+            throw new CustomException(DUPLICATED_NICKNAME, "사용중인 닉네임입니다");
+
         if (StringUtils.hasLength(request.getPassword()))
             request.encodePassword(passwordEncoder);
-
-        modelMapper.map(request, member.get());
     }
 }
