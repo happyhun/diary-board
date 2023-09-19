@@ -1,10 +1,13 @@
 package com.example.diaryboard.global.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static com.example.diaryboard.global.exception.ExceptionCode.CONSTRAINT_VIOLATION;
 import static com.example.diaryboard.global.exception.ExceptionCode.INVALID_JSON_FORMAT;
 
 @RestControllerAdvice
@@ -23,6 +26,15 @@ public class GlobalExceptionHandler {
             detailMessage = "";
 
         CustomException ce = new CustomException(INVALID_JSON_FORMAT, detailMessage);
+        ErrorResponse response = new ErrorResponse(ce.getExceptionCode().getCode(), ce.getMessage(), ce.getDetailMessage());
+        return ResponseEntity.status(ce.getExceptionCode().getStatus()).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        String detailMessage = e.getMessage();
+
+        CustomException ce = new CustomException(CONSTRAINT_VIOLATION, detailMessage);
         ErrorResponse response = new ErrorResponse(ce.getExceptionCode().getCode(), ce.getMessage(), ce.getDetailMessage());
         return ResponseEntity.status(ce.getExceptionCode().getStatus()).body(response);
     }
