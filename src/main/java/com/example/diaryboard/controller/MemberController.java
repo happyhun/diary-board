@@ -47,7 +47,7 @@ public class MemberController {
 
     @PatchMapping
     public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestHeader("authorization") String accessToken,
-                                                                @RequestBody MemberProfileRequest request) {
+                                                                    @RequestBody MemberProfileRequest request) {
         accessToken = accessToken.replace("Bearer ", "");
         memberService.updateMemberProfile(accessToken, request);
         BasicMessageResponse response = new BasicMessageResponse("회원정보 수정 성공");

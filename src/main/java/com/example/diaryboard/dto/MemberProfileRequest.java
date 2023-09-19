@@ -11,8 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @AllArgsConstructor
 public class MemberProfileRequest {
 
-    String nickname;
-    String password;
+    private String nickname;
+    private String password;
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(password);

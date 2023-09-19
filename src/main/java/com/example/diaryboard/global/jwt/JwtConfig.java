@@ -17,7 +17,7 @@ import java.util.Base64;
 public class JwtConfig {
 
     public static final Duration EXP_ACCESS = Duration.ofMinutes(30);
-    public static Duration EXP_REFRESH = Duration.ofDays(30);
+    public static final Duration EXP_REFRESH = Duration.ofDays(30);
     public static final String SCOPE_ACCESS = "ACCESS";
     public static final String SCOPE_REFRESH = "REFRESH";
 

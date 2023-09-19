@@ -8,7 +8,7 @@ import com.example.diaryboard.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
+import org.modelmapper.config.Configuration.AccessLevel;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -16,12 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
-import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_ACCESS;
 import static com.example.diaryboard.global.jwt.JwtConfig.SCOPE_REFRESH;
 
 @Service
@@ -38,27 +35,38 @@ public class MemberService {
     @PostConstruct
     protected void init() {
         modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setSkipNullEnabled(true);
-        modelMapper.getConfiguration().setFieldMatchingEnabled(true).setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+        modelMapper.getConfiguration()
+                .setSkipNullEnabled(true)
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(AccessLevel.PRIVATE);
     }
 
     public Long signup(SignupRequest dto) {
+        checkDuplicateForSignup(dto);
+        Member member = dto.toEntity(passwordEncoder);
+
+        return memberRepository.save(member).getId();
+    }
+
+    private void checkDuplicateForSignup(SignupRequest dto) {
         if (memberRepository.existsByEmail(dto.getEmail()))
             throw new CustomException(DUPLICATED_EMAIL, "이미 가입된 이메일입니다");
 
         if (memberRepository.existsByNickname(dto.getNickname()))
             throw new CustomException(DUPLICATED_NICKNAME, "이미 가입된 닉네임입니다");
-
-        Member member = Member.builder()
-                .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .nickname(dto.getNickname())
-                .build();
-
-        return memberRepository.save(member).getId();
     }
 
     public LoginResponse login(LoginRequest dto) {
+        Long memberId = checkValidLogin(dto);
+
+        String subject = String.valueOf(memberId);
+        String accessToken = jwtProvider.generateAccessToken(subject);
+        String refreshToken = jwtProvider.generateRefreshToken(subject);
+
+        return new LoginResponse(accessToken, refreshToken);
+    }
+
+    private Long checkValidLogin(LoginRequest dto) {
         Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
 
         if (member.isEmpty())
@@ -67,11 +75,7 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getPassword(), member.get().getPassword()))
             throw new CustomException(UNAUTHORIZED_LOGIN, "틀린 비밀번호입니다");
 
-        String subject = String.valueOf(member.get().getId());
-        String accessToken = jwtProvider.generateAccessToken(subject);
-        String refreshToken = jwtProvider.generateRefreshToken(subject);
-
-        return new LoginResponse(accessToken, refreshToken);
+        return member.get().getId();
     }
 
     public ReissueResponse reissue(String refreshToken) {
@@ -91,31 +95,25 @@ public class MemberService {
     }
 
     public MemberProfileResponse getMemberProfile(String accessToken) {
-        Jwt jwt = jwtDecoder.decode(accessToken);
-
-        if (!jwt.getClaim("scp").equals(SCOPE_ACCESS))
-            throw new CustomException(INVALID_TOKEN, "access token이 아닙니다");
-
-        String subject = jwt.getSubject();
-        Long memberId = Long.valueOf(subject);
-
+        Long memberId = getMemberIdFromToken(accessToken);
         Optional<Member> member = memberRepository.findById(memberId);
+
         if (member.isEmpty())
             throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
         return new MemberProfileResponse(member.get().getNickname());
     }
 
-    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
+    private Long getMemberIdFromToken(String accessToken) {
         Jwt jwt = jwtDecoder.decode(accessToken);
 
-        if (!jwt.getClaim("scp").equals(SCOPE_ACCESS))
-            throw new CustomException(INVALID_TOKEN, "access token이 아닙니다");
+        return Long.valueOf(jwt.getSubject());
+    }
 
-        String subject = jwt.getSubject();
-        Long memberId = Long.valueOf(subject);
-
+    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
+        Long memberId = getMemberIdFromToken(accessToken);
         Optional<Member> member = memberRepository.findById(memberId);
+
         if (member.isEmpty())
             throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
@@ -123,7 +121,5 @@ public class MemberService {
             request.encodePassword(passwordEncoder);
 
         modelMapper.map(request, member.get());
-
-        System.out.println(member.get().getNickname());
     }
 }
