@@ -5,13 +5,19 @@ import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.global.jwt.JwtProvider;
 import com.example.diaryboard.repository.MemberRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
@@ -27,6 +33,14 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final JwtDecoder jwtDecoder;
+    private ModelMapper modelMapper;
+
+    @PostConstruct
+    protected void init() {
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+        modelMapper.getConfiguration().setFieldMatchingEnabled(true).setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+    }
 
     public Long signup(SignupRequest dto) {
         if (memberRepository.existsByEmail(dto.getEmail()))
@@ -92,7 +106,7 @@ public class MemberService {
         return new MemberProfileResponse(member.get().getNickname());
     }
 
-    public Long changeNickname(String accessToken, ChangeNicknameRequest request) {
+    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
         Jwt jwt = jwtDecoder.decode(accessToken);
 
         if (!jwt.getClaim("scp").equals(SCOPE_ACCESS))
@@ -105,8 +119,11 @@ public class MemberService {
         if (member.isEmpty())
             throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
-        member.get().changeNickname(request.getNickname());
+        if (StringUtils.hasLength(request.getPassword()))
+            request.encodePassword(passwordEncoder);
 
-        return memberId;
+        modelMapper.map(request, member.get());
+
+        System.out.println(member.get().getNickname());
     }
 }

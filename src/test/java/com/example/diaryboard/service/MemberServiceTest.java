@@ -138,23 +138,25 @@ class MemberServiceTest {
     }
 
     @Test
-    void 닉네임_변경() {
+    void 회원정보_비밀번호_수정() {
         // given
         String nickname = "임시완";
-        String changedNickname = "바뀐 임시완";
         String email = "test@gmail.com";
         String password = "test123!@#";
 
         SignupRequest signupRequest = new SignupRequest(email, password, nickname);
-        ChangeNicknameRequest  changeNicknameRequest = new ChangeNicknameRequest(changedNickname);
+
         // when
-        memberService.signup(signupRequest);
+        Long memberId = memberService.signup(signupRequest);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
 
-        memberService.changeNickname(loginResponse.getAccessToken(), changeNicknameRequest);
-        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile(loginResponse.getAccessToken());
+        String changedPassword = "test123!@#change";
+
+        memberService.updateMemberProfile(loginResponse.getAccessToken(), new MemberProfileRequest(null, changedPassword));
+        Optional<Member> member = memberRepository.findById(memberId);
 
         // then
-        assertThat(memberProfileResponse.getNickname()).isEqualTo(changeNicknameRequest.getNickname());
+        assertThat(member.get().getNickname()).isEqualTo(signupRequest.getNickname());
+        assertThat(passwordEncoder.matches(changedPassword, member.get().getPassword())).isTrue();
     }
 }

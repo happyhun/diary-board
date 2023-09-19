@@ -46,11 +46,11 @@ public class MemberController {
     }
 
     @PatchMapping
-    public ResponseEntity<BasicMessageResponse> changeNickname(@RequestHeader("authorization") String accessToken,
-                                                                @RequestBody ChangeNicknameRequest request) {
+    public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestHeader("authorization") String accessToken,
+                                                                @RequestBody MemberProfileRequest request) {
         accessToken = accessToken.replace("Bearer ", "");
-        memberService.changeNickname(accessToken, request);
-        BasicMessageResponse response = new BasicMessageResponse("닉네임 변경 성공");
+        memberService.updateMemberProfile(accessToken, request);
+        BasicMessageResponse response = new BasicMessageResponse("회원정보 수정 성공");
 
         return ResponseEntity.ok().body(response);
     }
