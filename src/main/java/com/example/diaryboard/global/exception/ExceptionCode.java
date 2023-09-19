@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 @RequiredArgsConstructor
 public enum ExceptionCode {
+    CONSTRAINT_VIOLATION(BAD_REQUEST, "DB_001", "DB 제약 조건 위반입니다"),
     INVALID_JSON_FORMAT(BAD_REQUEST, "JSON_001", "잘못된 JSON 요청입니다"),
     DUPLICATED_EMAIL(CONFLICT, "MEMBER_001", "중복된 이메일입니다"),
     DUPLICATED_NICKNAME(CONFLICT, "MEMBER_002", "중복된 닉네임입니다"),

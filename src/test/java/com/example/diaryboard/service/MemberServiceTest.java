@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@Transactional
 class MemberServiceTest {
 
     @Autowired
@@ -31,11 +33,6 @@ class MemberServiceTest {
 
     @Autowired
     JwtDecoder jwtDecoder;
-
-    @AfterEach
-    void afterEach() {
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 회원가입() {
@@ -114,7 +111,6 @@ class MemberServiceTest {
 
         // then
         assertThat(reissuedAccessToken.getSubject()).isEqualTo(accessToken.getSubject());
-        assertThatThrownBy(() -> memberService.reissue(loginResponse.getAccessToken())).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -134,27 +130,28 @@ class MemberServiceTest {
 
         // then
         assertThat(memberProfileResponse.getNickname()).isEqualTo(dto.getNickname());
-        assertThatThrownBy(() -> memberService.getMemberProfile(loginResponse.getRefreshToken())).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void 닉네임_변경() {
+    void 회원정보_비밀번호_수정() {
         // given
         String nickname = "임시완";
-        String changedNickname = "바뀐 임시완";
         String email = "test@gmail.com";
         String password = "test123!@#";
 
         SignupRequest signupRequest = new SignupRequest(email, password, nickname);
-        ChangeNicknameRequest  changeNicknameRequest = new ChangeNicknameRequest(changedNickname);
+
         // when
-        memberService.signup(signupRequest);
+        Long memberId = memberService.signup(signupRequest);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
 
-        memberService.changeNickname(loginResponse.getAccessToken(), changeNicknameRequest);
-        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile(loginResponse.getAccessToken());
+        String changedPassword = "test123!@#change";
+
+        memberService.updateMemberProfile(loginResponse.getAccessToken(), new MemberProfileRequest(null, changedPassword));
+        Optional<Member> member = memberRepository.findById(memberId);
 
         // then
-        assertThat(memberProfileResponse.getNickname()).isEqualTo(changeNicknameRequest.getNickname());
+        assertThat(member.get().getNickname()).isEqualTo(signupRequest.getNickname());
+        assertThat(passwordEncoder.matches(changedPassword, member.get().getPassword())).isTrue();
     }
 }

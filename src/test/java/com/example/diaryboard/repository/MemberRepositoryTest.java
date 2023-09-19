@@ -5,21 +5,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
-
-    @AfterEach
-    void afterEach() {
-        memberRepository.deleteAll();
-    }
 
     @Test
     void 회원_생성_조회() {
