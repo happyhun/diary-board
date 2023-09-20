@@ -154,4 +154,22 @@ class MemberServiceTest {
         assertThat(member.get().getNickname()).isEqualTo(signupRequest.getNickname());
         assertThat(passwordEncoder.matches(changedPassword, member.get().getPassword())).isTrue();
     }
+
+    @Test
+    void 회원탈퇴() {
+        // given
+        String nickname = "임시완";
+        String email = "test@gmail.com";
+        String password = "test123!@#";
+
+        SignupRequest signupRequest = new SignupRequest(email, password, nickname);
+
+        // when
+        Long memberId = memberService.signup(signupRequest);
+        LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+        memberService.deleteMember(loginResponse.getAccessToken());
+
+        // then
+        assertThat(memberRepository.existsById(memberId)).isFalse();
+    }
 }

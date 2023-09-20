@@ -54,4 +54,14 @@ public class MemberController {
 
         return ResponseEntity.ok().body(response);
     }
+
+    @DeleteMapping
+    public ResponseEntity<BasicMessageResponse> deleteMember(@RequestHeader("authorization") String accessToken) {
+        accessToken = accessToken.replace("Bearer ", "");
+        memberService.deleteMember(accessToken);
+        BasicMessageResponse response = new BasicMessageResponse("회원탈퇴 성공");
+
+        return ResponseEntity.ok().body(response);
+
+    }
 }
