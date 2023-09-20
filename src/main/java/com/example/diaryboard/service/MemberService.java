@@ -41,13 +41,13 @@ public class MemberService {
     }
 
     public Long signup(SignupRequest dto) {
-        checkDuplicateForSignup(dto);
+        validateSignup(dto);
         Member member = dto.toEntity(passwordEncoder);
 
         return memberRepository.save(member).getId();
     }
 
-    private void checkDuplicateForSignup(SignupRequest dto) {
+    private void validateSignup(SignupRequest dto) {
         if (memberRepository.existsByEmail(dto.getEmail()))
             throw new CustomException(DUPLICATED_EMAIL, "이미 가입된 이메일입니다");
 
@@ -56,7 +56,7 @@ public class MemberService {
     }
 
     public LoginResponse login(LoginRequest dto) {
-        Long memberId = checkValidLogin(dto);
+        Long memberId = validateLogin(dto);
 
         String subject = String.valueOf(memberId);
         String accessToken = jwtProvider.generateAccessToken(subject);
@@ -65,7 +65,7 @@ public class MemberService {
         return new LoginResponse(accessToken, refreshToken);
     }
 
-    private Long checkValidLogin(LoginRequest dto) {
+    private Long validateLogin(LoginRequest dto) {
         Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
 
         if (member.isEmpty())
@@ -113,16 +113,21 @@ public class MemberService {
         Long memberId = getMemberIdFromToken(accessToken);
         Member member = getValidMemberById(memberId);
 
-        checkValidMemberProfile(request);
+        validateUpdateMemberProfile(request);
 
         modelMapper.map(request, member);
     }
 
-    private void checkValidMemberProfile(MemberProfileRequest request) {
+    private void validateUpdateMemberProfile(MemberProfileRequest request) {
         if (StringUtils.hasLength(request.getNickname()) && memberRepository.existsByNickname(request.getNickname()))
             throw new CustomException(DUPLICATED_NICKNAME, "사용중인 닉네임입니다");
 
         if (StringUtils.hasLength(request.getPassword()))
             request.encodePassword(passwordEncoder);
+    }
+
+    public void deleteMember(String accessToken) {
+        Long memberId = getMemberIdFromToken(accessToken);
+        memberRepository.deleteById(memberId);
     }
 }
