@@ -1,6 +1,7 @@
 package com.example.diaryboard.global.security;
 
 
+import com.example.diaryboard.global.jwt.CustomJwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,7 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -37,13 +37,14 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/members", "/members/login").permitAll()
-                .requestMatchers("/reissue").hasAuthority("SCOPE_REFRESH")
+                .requestMatchers("/members/reissue").hasAuthority("SCOPE_REFRESH")
                 .anyRequest().authenticated()
         );
 
         http.oauth2ResourceServer(oauth2 -> oauth2
-                .authenticationEntryPoint(new OAuth2AuthenticationEntryPoint())
-                .jwt(jwt -> new JwtAuthenticationConverter())
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter()))
         );
 
         return http.build();

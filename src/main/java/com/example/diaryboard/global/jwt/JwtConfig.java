@@ -20,6 +20,8 @@ public class JwtConfig {
     public static final Duration EXP_REFRESH = Duration.ofDays(30);
     public static final String SCOPE_ACCESS = "ACCESS";
     public static final String SCOPE_REFRESH = "REFRESH";
+    public static final String ROLE_USER = "USER";
+    public static final String ROLE_ADMIN = "ADMIN";
 
     @Value("${jwt.secret-key}")
     private String secretKey;

@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import static com.example.diaryboard.global.jwt.JwtConfig.*;
 
@@ -21,14 +22,14 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(String subject) {
-        return generateToken(subject, EXP_ACCESS, SCOPE_ACCESS);
+        return generateToken(subject, EXP_ACCESS, SCOPE_ACCESS, List.of(ROLE_USER));
     }
 
     public String generateRefreshToken(String subject) {
-        return generateToken(subject, EXP_REFRESH, SCOPE_REFRESH);
+        return generateToken(subject, EXP_REFRESH, SCOPE_REFRESH, List.of(ROLE_USER));
     }
 
-    private String generateToken(String subject, Duration expirationTime, String scope) {
+    private String generateToken(String subject, Duration expirationTime, String scope, List<String> roles) {
         JWSSigner signer;
         try {
             signer = new MACSigner(secretKey);
@@ -41,6 +42,7 @@ public class JwtProvider {
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plus(expirationTime)))
                 .claim("scp", scope)
+                .claim("roles", roles)
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.HS256)
