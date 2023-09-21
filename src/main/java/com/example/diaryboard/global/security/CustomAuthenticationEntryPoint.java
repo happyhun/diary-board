@@ -5,20 +5,20 @@ import com.example.diaryboard.global.exception.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.INVALID_TOKEN;
 
-public class OAuth2AccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
-        CustomException e = new CustomException(INVALID_TOKEN, accessDeniedException.getMessage());
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        CustomException e = new CustomException(INVALID_TOKEN, authException.getMessage());
         writeErrorResponse(response, e);
     }
 

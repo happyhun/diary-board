@@ -5,6 +5,8 @@ import com.example.diaryboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -62,6 +64,10 @@ public class MemberController {
         BasicMessageResponse response = new BasicMessageResponse("회원탈퇴 성공");
 
         return ResponseEntity.ok().body(response);
+    }
 
+    @GetMapping("/test")
+    public Authentication test() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
 }
