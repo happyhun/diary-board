@@ -1,4 +1,4 @@
-package com.example.diaryboard.dto;
+package com.example.diaryboard.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

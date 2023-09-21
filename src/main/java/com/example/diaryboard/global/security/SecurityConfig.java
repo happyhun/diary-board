@@ -1,7 +1,6 @@
 package com.example.diaryboard.global.security;
 
 
-import com.example.diaryboard.global.jwt.CustomJwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -38,7 +37,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/members", "/members/login").permitAll()
                 .requestMatchers("/members/reissue").hasAuthority("SCOPE_REFRESH")
-                .anyRequest().authenticated()
+                .anyRequest().hasAuthority("SCOPE_ACCESS")
         );
 
         http.oauth2ResourceServer(oauth2 -> oauth2

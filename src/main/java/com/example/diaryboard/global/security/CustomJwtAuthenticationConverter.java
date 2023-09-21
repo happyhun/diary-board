@@ -1,4 +1,4 @@
-package com.example.diaryboard.global.jwt;
+package com.example.diaryboard.global.security;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
