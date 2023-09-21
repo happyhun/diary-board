@@ -1,4 +1,4 @@
-package com.example.diaryboard.dto;
+package com.example.diaryboard.dto.member;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,7 +8,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ReissueResponse {
+public class LoginResponse {
 
     private String accessToken;
+    private String refreshToken;
 }

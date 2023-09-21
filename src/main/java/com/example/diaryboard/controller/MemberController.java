@@ -1,6 +1,6 @@
 package com.example.diaryboard.controller;
 
-import com.example.diaryboard.dto.*;
+import com.example.diaryboard.dto.member.*;
 import com.example.diaryboard.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.diaryboard.dto;
+package com.example.diaryboard.dto.member;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

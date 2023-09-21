@@ -1,10 +1,9 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.dto.*;
+import com.example.diaryboard.dto.member.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.repository.MemberRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
