@@ -3,10 +3,13 @@ package com.example.diaryboard.service;
 import com.example.diaryboard.dto.member.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
+import com.example.diaryboard.global.security.CustomJwtAuthenticationConverter;
 import com.example.diaryboard.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -32,6 +35,8 @@ class MemberServiceTest {
 
     @Autowired
     JwtDecoder jwtDecoder;
+
+    CustomJwtAuthenticationConverter jwtAuthenticationConverter = new CustomJwtAuthenticationConverter();
 
     @Test
     void 회원가입() {
@@ -82,6 +87,7 @@ class MemberServiceTest {
         // when
         Long memberId = memberService.signup(dto);
         LoginResponse response = memberService.login(new LoginRequest(email, password));
+
         Jwt accessToken = jwtDecoder.decode(response.getAccessToken());
         Jwt refreshToken = jwtDecoder.decode(response.getRefreshToken());
 
@@ -100,16 +106,18 @@ class MemberServiceTest {
         SignupRequest dto = new SignupRequest(email, password, nickname);
 
         // when
-        Long memberId = memberService.signup(dto);
-
+        memberService.signup(dto);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
-        Jwt accessToken = jwtDecoder.decode(loginResponse.getAccessToken());
+        Jwt refreshToken = jwtDecoder.decode(loginResponse.getRefreshToken());
 
-        ReissueResponse reissueResponse = memberService.reissue(loginResponse.getRefreshToken());
-        Jwt reissuedAccessToken = jwtDecoder.decode(reissueResponse.getAccessToken());
+        Authentication authentication = jwtAuthenticationConverter.convert(refreshToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        ReissueResponse reissueResponse = memberService.reissue();
+        Jwt accessToken = jwtDecoder.decode(reissueResponse.getAccessToken());
 
         // then
-        assertThat(reissuedAccessToken.getSubject()).isEqualTo(accessToken.getSubject());
+        assertThat(refreshToken.getSubject()).isEqualTo(accessToken.getSubject());
     }
 
     @Test
@@ -124,8 +132,12 @@ class MemberServiceTest {
         // when
         memberService.signup(dto);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+        Jwt accessToken = jwtDecoder.decode(loginResponse.getRefreshToken());
 
-        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile(loginResponse.getAccessToken());
+        Authentication authentication = jwtAuthenticationConverter.convert(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        MemberProfileResponse memberProfileResponse = memberService.getMemberProfile();
 
         // then
         assertThat(memberProfileResponse.getNickname()).isEqualTo(dto.getNickname());
@@ -137,16 +149,19 @@ class MemberServiceTest {
         String nickname = "임시완";
         String email = "test@gmail.com";
         String password = "test123!@#";
+        String changedPassword = "test123!@#change";
 
         SignupRequest signupRequest = new SignupRequest(email, password, nickname);
 
         // when
         Long memberId = memberService.signup(signupRequest);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
+        Jwt accessToken = jwtDecoder.decode(loginResponse.getRefreshToken());
 
-        String changedPassword = "test123!@#change";
+        Authentication authentication = jwtAuthenticationConverter.convert(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        memberService.updateMemberProfile(loginResponse.getAccessToken(), new MemberProfileRequest(null, changedPassword));
+        memberService.updateMemberProfile(new MemberProfileRequest(null, changedPassword));
         Optional<Member> member = memberRepository.findById(memberId);
 
         // then
@@ -166,7 +181,12 @@ class MemberServiceTest {
         // when
         Long memberId = memberService.signup(signupRequest);
         LoginResponse loginResponse = memberService.login(new LoginRequest(email, password));
-        memberService.deleteMember(loginResponse.getAccessToken());
+        Jwt accessToken = jwtDecoder.decode(loginResponse.getRefreshToken());
+
+        Authentication authentication = jwtAuthenticationConverter.convert(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        memberService.deleteMember();
 
         // then
         assertThat(memberRepository.existsById(memberId)).isFalse();

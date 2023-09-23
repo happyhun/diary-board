@@ -1,5 +1,6 @@
 package com.example.diaryboard.controller;
 
+import com.example.diaryboard.dto.BasicMessageResponse;
 import com.example.diaryboard.dto.member.*;
 import com.example.diaryboard.service.MemberService;
 import jakarta.validation.Valid;
@@ -32,35 +33,30 @@ public class MemberController {
     }
 
     @GetMapping("/reissue")
-    public ResponseEntity<ReissueResponse> reissue(@RequestHeader("authorization") String refreshToken) {
-        refreshToken = refreshToken.replace("Bearer ", "");
-        ReissueResponse response = memberService.reissue(refreshToken);
+    public ResponseEntity<ReissueResponse> reissue() {
+        ReissueResponse response = memberService.reissue();
 
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping
-    public ResponseEntity<MemberProfileResponse> getMemberProfile(@RequestHeader("authorization") String accessToken) {
-        accessToken = accessToken.replace("Bearer ", "");
-        MemberProfileResponse response = memberService.getMemberProfile(accessToken);
+    public ResponseEntity<MemberProfileResponse> getMemberProfile() {
+        MemberProfileResponse response = memberService.getMemberProfile();
 
         return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping
-    public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestHeader("authorization") String accessToken,
-                                                                    @RequestBody MemberProfileRequest request) {
-        accessToken = accessToken.replace("Bearer ", "");
-        memberService.updateMemberProfile(accessToken, request);
+    public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestBody MemberProfileRequest request) {
+        memberService.updateMemberProfile(request);
         BasicMessageResponse response = new BasicMessageResponse("회원정보 수정 성공");
 
         return ResponseEntity.ok().body(response);
     }
 
     @DeleteMapping
-    public ResponseEntity<BasicMessageResponse> deleteMember(@RequestHeader("authorization") String accessToken) {
-        accessToken = accessToken.replace("Bearer ", "");
-        memberService.deleteMember(accessToken);
+    public ResponseEntity<BasicMessageResponse> deleteMember() {
+        memberService.deleteMember();
         BasicMessageResponse response = new BasicMessageResponse("회원탈퇴 성공");
 
         return ResponseEntity.ok().body(response);
