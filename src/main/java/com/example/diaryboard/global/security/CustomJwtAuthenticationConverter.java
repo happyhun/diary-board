@@ -14,9 +14,9 @@ import java.util.List;
 
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
-    private Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    private final Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-    private String principalClaimName = JwtClaimNames.SUB;
+    private final String principalClaimName = JwtClaimNames.SUB;
 
     @Override
     public final AbstractAuthenticationToken convert(Jwt jwt) {

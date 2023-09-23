@@ -9,8 +9,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration.AccessLevel;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,23 +77,21 @@ public class MemberService {
         return member.get().getId();
     }
 
-    public ReissueResponse reissue(String refreshToken) {
-        Long memberId = getMemberIdFromToken(refreshToken);
-        Member member = getValidMemberById(memberId);
+    public ReissueResponse reissue() {
+        Long memberId = getMemberIdFromAuthentication();
+        validateMemberId(memberId);
 
-        String subject = String.valueOf(member.getId());
+        String subject = String.valueOf(memberId);
         String accessToken = jwtProvider.generateAccessToken(subject);
 
         return new ReissueResponse(accessToken);
     }
 
-    private Long getMemberIdFromToken(String accessToken) {
-        Jwt jwt = jwtDecoder.decode(accessToken);
-
-        return Long.valueOf(jwt.getSubject());
+    private Long getMemberIdFromAuthentication() {
+        return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    private Member getValidMemberById(Long memberId) {
+    private Member validateMemberId(Long memberId) {
         Optional<Member> member = memberRepository.findById(memberId);
 
         if (member.isEmpty())
@@ -102,18 +100,18 @@ public class MemberService {
         return member.get();
     }
 
-    public MemberProfileResponse getMemberProfile(String accessToken) {
-        Long memberId = getMemberIdFromToken(accessToken);
-        Member member = getValidMemberById(memberId);
+    public MemberProfileResponse getMemberProfile() {
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = validateMemberId(memberId);
 
         return new MemberProfileResponse(member.getNickname());
     }
 
-    public void updateMemberProfile(String accessToken, MemberProfileRequest request) {
-        Long memberId = getMemberIdFromToken(accessToken);
-        Member member = getValidMemberById(memberId);
-
+    public void updateMemberProfile(MemberProfileRequest request) {
         validateUpdateMemberProfile(request);
+
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = validateMemberId(memberId);
 
         modelMapper.map(request, member);
     }
@@ -126,8 +124,8 @@ public class MemberService {
             request.encodePassword(passwordEncoder);
     }
 
-    public void deleteMember(String accessToken) {
-        Long memberId = getMemberIdFromToken(accessToken);
+    public void deleteMember() {
+        Long memberId = getMemberIdFromAuthentication();
         memberRepository.deleteById(memberId);
     }
 }
