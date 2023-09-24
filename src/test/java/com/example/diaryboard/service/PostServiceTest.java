@@ -78,4 +78,21 @@ class PostServiceTest {
         assertThat(post.get().getContent()).isEqualTo(request.getContent());
     }
 
+    @Test
+    void 게시글_삭제() {
+        // given
+        String title = "테스트용 게시글";
+        String content = "테스트용 게시글 내용입니다.";
+
+        CreatePostRequest request = new CreatePostRequest(title, content);
+        Long postId = postService.createPost(request);
+
+        // when
+        postService.deletePost(postId);
+        Optional<Post> post = postRepository.findById(postId);
+
+        // then
+        assertThat(post).isEmpty();
+    }
+
 }

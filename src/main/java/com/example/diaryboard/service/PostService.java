@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.example.diaryboard.global.exception.ExceptionCode.INVALID_TOKEN;
+import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,5 +43,24 @@ public class PostService {
             throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
         return member.get();
+    }
+
+    public void deletePost(Long postId) {
+        Long memberId = getMemberIdFromAuthentication();
+        Post post = validatePostId(postId);
+
+        if (!post.getMember().getId().equals(memberId))
+            throw new CustomException(UNAUTHORIZED_POST, "삭제 권한이 없습니다");
+
+        postRepository.deleteById(postId);
+    }
+
+    private Post validatePostId(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+
+        if (post.isEmpty())
+            throw new CustomException(INVALID_POST, "잘못된 postId입니다");
+
+        return post.get();
     }
 }
