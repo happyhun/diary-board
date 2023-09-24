@@ -1,6 +1,7 @@
 package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.post.CreatePostRequest;
+import com.example.diaryboard.dto.post.GetPostResponse;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
@@ -59,8 +60,14 @@ public class PostService {
         Optional<Post> post = postRepository.findById(postId);
 
         if (post.isEmpty())
-            throw new CustomException(INVALID_POST, "잘못된 postId입니다");
+            throw new CustomException(INVALID_POST, "잘못된 post id입니다");
 
         return post.get();
+    }
+
+    public GetPostResponse getPost(Long postId) {
+        Post post = validatePostId(postId);
+
+        return new GetPostResponse(post);
     }
 }

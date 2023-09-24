@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/members", "POST")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/members/login", "POST")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/posts/**", "GET")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/members/reissue")).hasAuthority("SCOPE_REFRESH")
                 .anyRequest().hasAuthority("SCOPE_ACCESS")
         );

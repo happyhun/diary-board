@@ -2,6 +2,7 @@ package com.example.diaryboard.controller;
 
 import com.example.diaryboard.dto.BasicMessageResponse;
 import com.example.diaryboard.dto.post.CreatePostRequest;
+import com.example.diaryboard.dto.post.GetPostResponse;
 import com.example.diaryboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,13 @@ public class PostController {
     public ResponseEntity<BasicMessageResponse> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         BasicMessageResponse response = new BasicMessageResponse("게시글 삭제 성공");
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<GetPostResponse> getPost(@PathVariable Long postId) {
+        GetPostResponse response = postService.getPost(postId);
 
         return ResponseEntity.ok().body(response);
     }
