@@ -11,13 +11,15 @@ import java.time.LocalDateTime;
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GetPostResponse {
 
-    private String title;
-    private String content;
-    private String author;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
+    private final Long id;
+    private final String title;
+    private final String content;
+    private final String author;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime modifiedAt;
 
     public GetPostResponse(Post post) {
+        this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.author = post.getMember().getNickname();
