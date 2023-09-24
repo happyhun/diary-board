@@ -47,7 +47,7 @@ public class MemberController {
     }
 
     @PatchMapping
-    public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestBody MemberProfileRequest request) {
+    public ResponseEntity<BasicMessageResponse> updateMemberProfile(@RequestBody @Valid MemberProfileRequest request) {
         memberService.updateMemberProfile(request);
         BasicMessageResponse response = new BasicMessageResponse("회원정보 수정 성공");
 
