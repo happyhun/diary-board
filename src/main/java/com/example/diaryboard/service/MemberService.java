@@ -5,6 +5,7 @@ import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.global.jwt.JwtProvider;
 import com.example.diaryboard.repository.MemberRepository;
+import com.example.diaryboard.repository.PostRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,6 +30,7 @@ public class MemberService {
     private final JwtProvider jwtProvider;
 
     private ModelMapper modelMapper;
+    private final PostRepository postRepository;
 
     @PostConstruct
     protected void init() {
@@ -125,6 +127,7 @@ public class MemberService {
 
     public void deleteMember() {
         Long memberId = getMemberIdFromAuthentication();
+        postRepository.deleteByMemberId(memberId); // 추후에 soft delete로 변경
         memberRepository.deleteById(memberId);
     }
 }
