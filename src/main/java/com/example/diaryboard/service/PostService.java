@@ -2,12 +2,16 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.post.CreatePostRequest;
 import com.example.diaryboard.dto.post.GetPostResponse;
+import com.example.diaryboard.dto.post.UpdatePostRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.repository.MemberRepository;
 import com.example.diaryboard.repository.PostRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,16 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private ModelMapper modelMapper;
+
+    @PostConstruct
+    protected void init() {
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setSkipNullEnabled(true)
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+    }
 
     public Long createPost(CreatePostRequest dto) {
         Long memberId = getMemberIdFromAuthentication();
@@ -54,5 +68,18 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
         return new GetPostResponse(post);
+    }
+
+    public void updatePost(Long postId, UpdatePostRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
+
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = post.getMember();
+
+        if (!member.getId().equals(memberId))
+            throw new CustomException(UNAUTHORIZED_POST, "수정 권한이 없습니다");
+
+        modelMapper.map(request, post);
     }
 }
