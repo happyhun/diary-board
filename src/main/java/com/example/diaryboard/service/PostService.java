@@ -12,8 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
 @Service
@@ -26,7 +24,8 @@ public class PostService {
 
     public Long createPost(CreatePostRequest dto) {
         Long memberId = getMemberIdFromAuthentication();
-        Member member = validateMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다"));
 
         Post post = dto.toEntity(member);
 
@@ -37,36 +36,22 @@ public class PostService {
         return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    private Member validateMemberId(Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
-
-        if (member.isEmpty())
-            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
-
-        return member.get();
-    }
-
     public void deletePost(Long postId) {
-        Long memberId = getMemberIdFromAuthentication();
-        Post post = validatePostId(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
-        if (!post.getMember().getId().equals(memberId))
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = post.getMember();
+
+        if (!member.getId().equals(memberId))
             throw new CustomException(UNAUTHORIZED_POST, "삭제 권한이 없습니다");
 
         postRepository.deleteById(postId);
     }
 
-    private Post validatePostId(Long postId) {
-        Optional<Post> post = postRepository.findById(postId);
-
-        if (post.isEmpty())
-            throw new CustomException(INVALID_POST, "잘못된 post id입니다");
-
-        return post.get();
-    }
-
     public GetPostResponse getPost(Long postId) {
-        Post post = validatePostId(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
         return new GetPostResponse(post);
     }

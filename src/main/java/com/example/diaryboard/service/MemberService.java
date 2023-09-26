@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Optional;
-
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
 @Service
@@ -28,9 +26,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-
-    private ModelMapper modelMapper;
     private final PostRepository postRepository;
+    private ModelMapper modelMapper;
 
     @PostConstruct
     protected void init() {
@@ -67,20 +64,20 @@ public class MemberService {
     }
 
     private Long validateLogin(LoginRequest dto) {
-        Optional<Member> member = memberRepository.findByEmail(dto.getEmail());
+        Member member = memberRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new CustomException(UNAUTHORIZED_LOGIN, "가입되지 않은 이메일입니다"));
 
-        if (member.isEmpty())
-            throw new CustomException(UNAUTHORIZED_LOGIN, "가입되지 않은 이메일입니다");
-
-        if (!passwordEncoder.matches(dto.getPassword(), member.get().getPassword()))
+        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword()))
             throw new CustomException(UNAUTHORIZED_LOGIN, "틀린 비밀번호입니다");
 
-        return member.get().getId();
+        return member.getId();
     }
 
     public ReissueResponse reissue() {
         Long memberId = getMemberIdFromAuthentication();
-        validateMemberId(memberId);
+
+        if (!memberRepository.existsById(memberId))
+            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
 
         String subject = String.valueOf(memberId);
         String accessToken = jwtProvider.generateAccessToken(subject);
@@ -92,18 +89,10 @@ public class MemberService {
         return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    private Member validateMemberId(Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
-
-        if (member.isEmpty())
-            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
-
-        return member.get();
-    }
-
     public MemberProfileResponse getMemberProfile() {
         Long memberId = getMemberIdFromAuthentication();
-        Member member = validateMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다"));
 
         return new MemberProfileResponse(member.getNickname());
     }
@@ -112,7 +101,8 @@ public class MemberService {
         validateUpdateMemberProfile(request);
 
         Long memberId = getMemberIdFromAuthentication();
-        Member member = validateMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다"));
 
         modelMapper.map(request, member);
     }
