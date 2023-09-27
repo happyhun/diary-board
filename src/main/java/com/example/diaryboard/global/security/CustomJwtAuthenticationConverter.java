@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
     @Override
     public final AbstractAuthenticationToken convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = this.jwtGrantedAuthoritiesConverter.convert(jwt);
+
+        if (authorities == null) {
+            authorities = new ArrayList<>();
+        }
 
         for (String authority : (List<String>) jwt.getClaim("roles")) {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + authority));
