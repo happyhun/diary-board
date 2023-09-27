@@ -2,17 +2,19 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.post.CreatePostRequest;
 import com.example.diaryboard.dto.post.GetPostResponse;
+import com.example.diaryboard.dto.post.UpdatePostRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.repository.MemberRepository;
 import com.example.diaryboard.repository.PostRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
@@ -23,10 +25,21 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private ModelMapper modelMapper;
+
+    @PostConstruct
+    protected void init() {
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration()
+                .setSkipNullEnabled(true)
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+    }
 
     public Long createPost(CreatePostRequest dto) {
         Long memberId = getMemberIdFromAuthentication();
-        Member member = validateMemberId(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다"));
 
         Post post = dto.toEntity(member);
 
@@ -37,37 +50,36 @@ public class PostService {
         return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
-    private Member validateMemberId(Long memberId) {
-        Optional<Member> member = memberRepository.findById(memberId);
-
-        if (member.isEmpty())
-            throw new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다");
-
-        return member.get();
-    }
-
     public void deletePost(Long postId) {
-        Long memberId = getMemberIdFromAuthentication();
-        Post post = validatePostId(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
-        if (!post.getMember().getId().equals(memberId))
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = post.getMember();
+
+        if (!member.getId().equals(memberId))
             throw new CustomException(UNAUTHORIZED_POST, "삭제 권한이 없습니다");
 
         postRepository.deleteById(postId);
     }
 
-    private Post validatePostId(Long postId) {
-        Optional<Post> post = postRepository.findById(postId);
-
-        if (post.isEmpty())
-            throw new CustomException(INVALID_POST, "잘못된 post id입니다");
-
-        return post.get();
-    }
-
     public GetPostResponse getPost(Long postId) {
-        Post post = validatePostId(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
         return new GetPostResponse(post);
+    }
+
+    public void updatePost(Long postId, UpdatePostRequest request) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
+
+        Long memberId = getMemberIdFromAuthentication();
+        Member member = post.getMember();
+
+        if (!member.getId().equals(memberId))
+            throw new CustomException(UNAUTHORIZED_POST, "수정 권한이 없습니다");
+
+        modelMapper.map(request, post);
     }
 }

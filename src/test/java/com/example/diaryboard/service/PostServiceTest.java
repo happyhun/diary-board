@@ -2,6 +2,7 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.post.CreatePostRequest;
 import com.example.diaryboard.dto.post.GetPostResponse;
+import com.example.diaryboard.dto.post.UpdatePostRequest;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.jwt.JwtProvider;
@@ -108,6 +109,26 @@ class PostServiceTest {
 
         // then
         assertThat(response.getId()).isEqualTo(postId);
+    }
+
+    @Test
+    void 게시글_수정() {
+        // given
+        String title = "테스트용 게시글";
+        String content = "테스트용 게시글 내용입니다.";
+
+        CreatePostRequest request = new CreatePostRequest(title, content);
+        Long postId = postService.createPost(request);
+
+        String updatedTitle = "수정된 게시글";
+
+        // when
+        postService.updatePost(postId, new UpdatePostRequest(updatedTitle, null));
+        Post post = postRepository.findById(postId).orElseThrow();
+
+        // then
+        assertThat(post.getTitle()).isEqualTo(updatedTitle);
+        assertThat(post.getContent()).isEqualTo(content);
     }
 
 }

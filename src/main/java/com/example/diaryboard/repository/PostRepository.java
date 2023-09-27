@@ -10,4 +10,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Override
     @EntityGraph(attributePaths = {"member"})
     Optional<Post> findById(Long id);
+
+    void deleteByMemberId(Long memberId);
 }

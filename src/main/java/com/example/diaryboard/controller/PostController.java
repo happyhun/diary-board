@@ -3,6 +3,7 @@ package com.example.diaryboard.controller;
 import com.example.diaryboard.dto.BasicMessageResponse;
 import com.example.diaryboard.dto.post.CreatePostRequest;
 import com.example.diaryboard.dto.post.GetPostResponse;
+import com.example.diaryboard.dto.post.UpdatePostRequest;
 import com.example.diaryboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
 
@@ -35,6 +36,14 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<GetPostResponse> getPost(@PathVariable Long postId) {
         GetPostResponse response = postService.getPost(postId);
+
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<BasicMessageResponse> updatePost(@PathVariable Long postId, @RequestBody UpdatePostRequest request) {
+        postService.updatePost(postId, request);
+        BasicMessageResponse response = new BasicMessageResponse("게시글 수정 성공");
 
         return ResponseEntity.ok().body(response);
     }
