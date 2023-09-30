@@ -1,8 +1,6 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.dto.post.CreatePostRequest;
-import com.example.diaryboard.dto.post.GetPostResponse;
-import com.example.diaryboard.dto.post.UpdatePostRequest;
+import com.example.diaryboard.dto.post.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
@@ -12,6 +10,9 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,5 +82,25 @@ public class PostService {
             throw new CustomException(UNAUTHORIZED_POST, "수정 권한이 없습니다");
 
         modelMapper.map(request, post);
+    }
+
+    public Page<GetPostResponse> getPosts(int page, int size, SortType sortBy, DirectionType direction, SearchType searchBy, String keyword) {
+        PageRequest pageRequest = createPageRequest(page, size, sortBy, direction);
+
+        if (keyword.isEmpty()) {
+            return postRepository.findAll(pageRequest).map(GetPostResponse::new);
+        }
+
+        return switch (searchBy) {
+            case ALL -> postRepository.findByKeyword(keyword, pageRequest).map(GetPostResponse::new);
+            case AUTHOR -> postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostResponse::new);
+            case TITLE -> postRepository.findByTitleContaining(keyword, pageRequest).map(GetPostResponse::new);
+            case CONTENT -> postRepository.findByContentContaining(keyword, pageRequest).map(GetPostResponse::new);
+        };
+    }
+
+    private PageRequest createPageRequest(int page, int size, SortType sortBy, DirectionType direction) {
+        Sort sort = (direction == DirectionType.ASC) ? Sort.by(sortBy.name().toLowerCase()).ascending() : Sort.by(sortBy.name().toLowerCase()).descending();
+        return PageRequest.of(page, size, sort);
     }
 }

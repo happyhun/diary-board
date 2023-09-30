@@ -6,8 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +40,7 @@ class PostRepositoryTest {
     }
 
     @Test
-    void 게시글_생성_조회() {
+    void 게시글_생성_단건조회() {
         // given
         String title = "게시판 테스트";
         String content = "게시판테스트입니다.";
@@ -77,5 +81,59 @@ class PostRepositoryTest {
 
         // then
         assertThat(findPost).isEmpty();
+    }
+
+    @Test
+    void 게시글_작성자로_조회() {
+        // given
+        String title = "게시판 테스트";
+        String content = "게시판테스트입니다.";
+        String keyword = "시완";
+
+        Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .member(saveMember)
+                .build();
+
+        Post savePost = postRepository.save(post);
+
+        // when
+        Page<Post> postPage = postRepository.findByMemberNicknameContaining(
+                keyword,
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id")));
+
+        List<Post> posts = postPage.getContent();
+
+        // then
+        assertThat(posts).hasSize(1);
+        assertThat(posts.get(0).getTitle()).isEqualTo(post.getTitle());
+    }
+
+    @Test
+    void 게시글_전체검색_조회() {
+        // given
+        String title = "게시판 테스트";
+        String content = "게시판테스트입니다.";
+        String keyword = "테스트";
+
+        Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .member(saveMember)
+                .build();
+
+        Post savePost = postRepository.save(post);
+
+        // when
+        Page<Post> postPage = postRepository.findByKeyword(
+                keyword,
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id")));
+
+        List<Post> posts = postPage.getContent();
+
+        // then
+        assertThat(posts).hasSize(1);
+        assertThat(posts.get(0).getId()).isEqualTo(savePost.getId());
     }
 }
