@@ -1,12 +1,11 @@
 package com.example.diaryboard.controller;
 
 import com.example.diaryboard.dto.BasicMessageResponse;
-import com.example.diaryboard.dto.post.CreatePostRequest;
-import com.example.diaryboard.dto.post.GetPostResponse;
-import com.example.diaryboard.dto.post.UpdatePostRequest;
+import com.example.diaryboard.dto.post.*;
 import com.example.diaryboard.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +44,18 @@ public class PostController {
         postService.updatePost(postId, request);
         BasicMessageResponse response = new BasicMessageResponse("게시글 수정 성공");
 
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<GetPostResponse>> getPosts(@RequestParam(defaultValue = "0") int page,
+                                                          @RequestParam(defaultValue = "7") int size,
+                                                          @RequestParam(defaultValue = "id") SortType sortBy,
+                                                          @RequestParam(defaultValue = "desc") DirectionType direction,
+                                                          @RequestParam(defaultValue = "all") SearchType searchBy,
+                                                          @RequestParam(defaultValue = "") String keyword) {
+
+        Page<GetPostResponse> response = postService.getPosts(page, size, sortBy, direction, searchBy, keyword);
         return ResponseEntity.ok().body(response);
     }
 }
