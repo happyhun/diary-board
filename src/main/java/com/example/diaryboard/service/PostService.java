@@ -93,7 +93,8 @@ public class PostService {
 
         return switch (searchBy) {
             case ALL -> postRepository.findByKeyword(keyword, pageRequest).map(GetPostResponse::new);
-            case AUTHOR -> postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostResponse::new);
+            case AUTHOR ->
+                    postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostResponse::new);
             case TITLE -> postRepository.findByTitleContaining(keyword, pageRequest).map(GetPostResponse::new);
             case CONTENT -> postRepository.findByContentContaining(keyword, pageRequest).map(GetPostResponse::new);
         };

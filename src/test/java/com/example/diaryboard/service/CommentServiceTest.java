@@ -1,6 +1,7 @@
 package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.comment.CreateCommentRequest;
+import com.example.diaryboard.dto.comment.UpdateCommentRequest;
 import com.example.diaryboard.entity.Comment;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
@@ -29,25 +30,18 @@ class CommentServiceTest {
 
     @Autowired
     CommentService commentService;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
     @Autowired
     PostRepository postRepository;
-
     @Autowired
     MemberRepository memberRepository;
-
     @Autowired
     JwtProvider jwtProvider;
-
     @Autowired
     JwtDecoder jwtDecoder;
-
     CustomJwtAuthenticationConverter jwtAuthenticationConverter = new CustomJwtAuthenticationConverter();
-
     Long postId;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -88,5 +82,37 @@ class CommentServiceTest {
         assertThat(comment.get().getContent()).isEqualTo(request.getContent());
     }
 
+    @Test
+    void 댓글_삭제() {
+        // given
+        String content = "댓글 내용입니다.";
 
+        CreateCommentRequest request = new CreateCommentRequest(content);
+        Long commentId = commentService.createComment(postId, request);
+
+        // when
+        commentService.deleteComment(commentId);
+        Optional<Comment> comment = commentRepository.findById(commentId);
+
+        // then
+        assertThat(comment).isEmpty();
+    }
+
+    @Test
+    void 댓글_수정() {
+        // given
+        String content = "댓글 내용입니다.";
+
+        CreateCommentRequest request = new CreateCommentRequest(content);
+        Long commentId = commentService.createComment(postId, request);
+
+        String updatedContent = "수정된 댓글 내용입니다.";
+
+        // when
+        commentService.updateComment(commentId, new UpdateCommentRequest(updatedContent));
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+
+        // then
+        assertThat(comment.getContent()).isEqualTo(updatedContent);
+    }
 }
