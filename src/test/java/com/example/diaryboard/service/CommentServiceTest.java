@@ -30,18 +30,25 @@ class CommentServiceTest {
 
     @Autowired
     CommentService commentService;
+
     @Autowired
     PostRepository postRepository;
+
     @Autowired
     MemberRepository memberRepository;
+
     @Autowired
     JwtProvider jwtProvider;
+
     @Autowired
     JwtDecoder jwtDecoder;
+
     CustomJwtAuthenticationConverter jwtAuthenticationConverter = new CustomJwtAuthenticationConverter();
+
     Long postId;
+
     @Autowired
-    private CommentRepository commentRepository;
+    CommentRepository commentRepository;
 
     @BeforeEach
     void beforeEach() {
@@ -71,10 +78,10 @@ class CommentServiceTest {
     void 댓글_생성() {
         // given
         String content = "댓글 내용입니다.";
-        CreateCommentRequest request = new CreateCommentRequest(content);
+        CreateCommentRequest request = new CreateCommentRequest(postId, content);
 
         // when
-        Long commentId = commentService.createComment(postId, request);
+        Long commentId = commentService.createComment(request);
         Optional<Comment> comment = commentRepository.findById(commentId);
 
         // then
@@ -87,8 +94,8 @@ class CommentServiceTest {
         // given
         String content = "댓글 내용입니다.";
 
-        CreateCommentRequest request = new CreateCommentRequest(content);
-        Long commentId = commentService.createComment(postId, request);
+        CreateCommentRequest request = new CreateCommentRequest(postId, content);
+        Long commentId = commentService.createComment(request);
 
         // when
         commentService.deleteComment(commentId);
@@ -103,8 +110,8 @@ class CommentServiceTest {
         // given
         String content = "댓글 내용입니다.";
 
-        CreateCommentRequest request = new CreateCommentRequest(content);
-        Long commentId = commentService.createComment(postId, request);
+        CreateCommentRequest request = new CreateCommentRequest(postId, content);
+        Long commentId = commentService.createComment(request);
 
         String updatedContent = "수정된 댓글 내용입니다.";
 

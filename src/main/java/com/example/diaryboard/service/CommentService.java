@@ -25,12 +25,12 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
-    public Long createComment(Long postId, CreateCommentRequest dto) {
+    public Long createComment(CreateCommentRequest dto) {
         Long memberId = getMemberIdFromAuthentication();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(INVALID_TOKEN, "존재하지 않는 subject입니다"));
 
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
         return commentRepository.save(dto.toEntity(member, post)).getId();
