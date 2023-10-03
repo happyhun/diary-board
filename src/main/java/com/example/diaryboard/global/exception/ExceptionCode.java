@@ -17,7 +17,9 @@ public enum ExceptionCode {
     INVALID_TOKEN(BAD_REQUEST, "TOKEN_001", "유효하지 않은 토큰입니다"),
     UNAUTHORIZED_TOKEN(UNAUTHORIZED, "TOKEN_002", "권한이 없는 토큰입니다"),
     INVALID_POST(BAD_REQUEST, "POST_001", "존재하지 않는 게시글입니다"),
-    UNAUTHORIZED_POST(UNAUTHORIZED, "POST_002", "잘못된 게시글 요청입니다");
+    UNAUTHORIZED_POST(UNAUTHORIZED, "POST_002", "잘못된 게시글 요청입니다"),
+    INVALID_COMMENT(BAD_REQUEST, "COMMENT_001", "존재하지 않는 댓글입니다"),
+    UNAUTHORIZED_COMMENT(UNAUTHORIZED, "COMMENT_002", "잘못된 댓글 요청입니다");
 
     private final HttpStatus status;
     private final String code;

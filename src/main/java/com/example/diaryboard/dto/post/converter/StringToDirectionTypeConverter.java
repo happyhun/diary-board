@@ -1,7 +1,6 @@
 package com.example.diaryboard.dto.post.converter;
 
 import com.example.diaryboard.dto.post.DirectionType;
-import com.example.diaryboard.dto.post.SortType;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
