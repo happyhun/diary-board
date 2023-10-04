@@ -48,14 +48,14 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<GetPostResponse>> getPosts(@RequestParam(defaultValue = "0") int page,
-                                                          @RequestParam(defaultValue = "7") int size,
-                                                          @RequestParam(defaultValue = "id") SortType sortBy,
-                                                          @RequestParam(defaultValue = "desc") DirectionType direction,
-                                                          @RequestParam(defaultValue = "all") SearchType searchBy,
-                                                          @RequestParam(defaultValue = "") String keyword) {
+    public ResponseEntity<Page<GetPostPageResponse>> getPosts(@RequestParam(defaultValue = "0") int page,
+                                                              @RequestParam(defaultValue = "7") int size,
+                                                              @RequestParam(defaultValue = "id") SortType sortBy,
+                                                              @RequestParam(defaultValue = "desc") DirectionType direction,
+                                                              @RequestParam(defaultValue = "all") SearchType searchBy,
+                                                              @RequestParam(defaultValue = "") String keyword) {
 
-        Page<GetPostResponse> response = postService.getPosts(page, size, sortBy, direction, searchBy, keyword);
+        Page<GetPostPageResponse> response = postService.getPostPage(page, size, sortBy, direction, searchBy, keyword);
         return ResponseEntity.ok().body(response);
     }
 }
