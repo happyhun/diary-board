@@ -3,6 +3,9 @@ package com.example.diaryboard.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -19,4 +22,9 @@ public class Post extends BaseTimeEntity {
 
     private String title;
     private String content;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
+
 }

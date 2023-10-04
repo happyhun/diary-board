@@ -1,5 +1,6 @@
 package com.example.diaryboard.service;
 
+import com.example.diaryboard.dto.comment.GetCommentResponse;
 import com.example.diaryboard.dto.post.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
@@ -68,7 +71,11 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
-        return new GetPostResponse(post);
+        List<GetCommentResponse> comments = post.getComments().stream()
+                .map(GetCommentResponse::new)
+                .toList();
+
+        return new GetPostResponse(post, comments);
     }
 
     public void updatePost(Long postId, UpdatePostRequest request) {
@@ -84,19 +91,19 @@ public class PostService {
         modelMapper.map(request, post);
     }
 
-    public Page<GetPostResponse> getPosts(int page, int size, SortType sortBy, DirectionType direction, SearchType searchBy, String keyword) {
+    public Page<GetPostPageResponse> getPostPage(int page, int size, SortType sortBy, DirectionType direction, SearchType searchBy, String keyword) {
         PageRequest pageRequest = createPageRequest(page, size, sortBy, direction);
 
         if (keyword.isEmpty()) {
-            return postRepository.findAll(pageRequest).map(GetPostResponse::new);
+            return postRepository.findAll(pageRequest).map(GetPostPageResponse::new);
         }
 
         return switch (searchBy) {
-            case ALL -> postRepository.findByKeyword(keyword, pageRequest).map(GetPostResponse::new);
+            case ALL -> postRepository.findByKeyword(keyword, pageRequest).map(GetPostPageResponse::new);
             case AUTHOR ->
-                    postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostResponse::new);
-            case TITLE -> postRepository.findByTitleContaining(keyword, pageRequest).map(GetPostResponse::new);
-            case CONTENT -> postRepository.findByContentContaining(keyword, pageRequest).map(GetPostResponse::new);
+                    postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostPageResponse::new);
+            case TITLE -> postRepository.findByTitleContaining(keyword, pageRequest).map(GetPostPageResponse::new);
+            case CONTENT -> postRepository.findByContentContaining(keyword, pageRequest).map(GetPostPageResponse::new);
         };
     }
 
