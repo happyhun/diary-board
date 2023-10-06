@@ -80,7 +80,8 @@ class HeartRepositoryTest {
         Heart saveHeart = heartRepository.save(heart);
 
         // when
-        heartRepository.delete(saveHeart);
+        Heart findHeart = heartRepository.findByMemberIdAndPostId(saveMember.getId(), savePost.getId()).orElseThrow();
+        heartRepository.delete(findHeart);
 
         // then
         assertThat(heartRepository.findById(saveHeart.getId())).isEmpty();
