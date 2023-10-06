@@ -19,7 +19,8 @@ public enum ExceptionCode {
     INVALID_POST(BAD_REQUEST, "POST_001", "존재하지 않는 게시글입니다"),
     UNAUTHORIZED_POST(UNAUTHORIZED, "POST_002", "잘못된 게시글 요청입니다"),
     INVALID_COMMENT(BAD_REQUEST, "COMMENT_001", "존재하지 않는 댓글입니다"),
-    UNAUTHORIZED_COMMENT(UNAUTHORIZED, "COMMENT_002", "잘못된 댓글 요청입니다");
+    UNAUTHORIZED_COMMENT(UNAUTHORIZED, "COMMENT_002", "잘못된 댓글 요청입니다"),
+    INVALID_HEART(BAD_REQUEST, "HEART_001", "존재하지 않는 좋아요입니다");
 
     private final HttpStatus status;
     private final String code;
