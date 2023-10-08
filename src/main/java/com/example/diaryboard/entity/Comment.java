@@ -23,7 +23,14 @@ public class Comment extends BaseTimeEntity {
 
     private String content;
 
+    @Builder.Default
+    private Integer heartCount = 0;
+
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updateHeartCount(Integer heartCount) {
+        this.heartCount = heartCount;
     }
 }
