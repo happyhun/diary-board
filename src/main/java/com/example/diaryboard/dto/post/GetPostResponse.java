@@ -19,6 +19,7 @@ public class GetPostResponse {
     private final String author;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
+    private final Integer heartCount;
     private final List<GetCommentResponse> comments;
 
     public GetPostResponse(Post post, List<GetCommentResponse> comments) {
@@ -28,6 +29,7 @@ public class GetPostResponse {
         this.author = post.getMember().getNickname();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
+        this.heartCount = post.getHeartCount();
         this.comments = comments;
     }
 }
