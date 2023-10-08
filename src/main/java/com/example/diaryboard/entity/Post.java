@@ -27,4 +27,10 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
+    private Integer heartCount = 0;
+
+    public void updateHeartCount(Integer heartCount) {
+        this.heartCount = heartCount;
+    }
 }

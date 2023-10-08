@@ -35,6 +35,7 @@ public class HeartService {
             Post post = postRepository.findById(dto.getId())
                     .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
+            post.updateHeartCount(post.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, post));
         }
     }
@@ -50,6 +51,8 @@ public class HeartService {
             Heart heart = heartRepository.findByMemberIdAndPostId(memberId, dto.getId())
                     .orElseThrow(() -> new CustomException(INVALID_HEART, "게시글에 대한 좋아요가 없습니다"));
 
+            Post post = heart.getPost();
+            post.updateHeartCount(post.getHeartCount() - 1);
             heartRepository.delete(heart);
         }
     }
