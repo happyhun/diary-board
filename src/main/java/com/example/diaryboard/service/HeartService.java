@@ -2,11 +2,9 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.heart.CreateHeartRequest;
 import com.example.diaryboard.dto.heart.DeleteHeartRequest;
-import com.example.diaryboard.entity.Heart;
-import com.example.diaryboard.entity.HeartType;
-import com.example.diaryboard.entity.Member;
-import com.example.diaryboard.entity.Post;
+import com.example.diaryboard.entity.*;
 import com.example.diaryboard.global.exception.CustomException;
+import com.example.diaryboard.repository.CommentRepository;
 import com.example.diaryboard.repository.HeartRepository;
 import com.example.diaryboard.repository.MemberRepository;
 import com.example.diaryboard.repository.PostRepository;
@@ -25,6 +23,7 @@ public class HeartService {
     private final HeartRepository heartRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     public void createHeart(CreateHeartRequest dto) {
         Long memberId = getMemberIdFromAuthentication();
@@ -37,6 +36,14 @@ public class HeartService {
 
             post.updateHeartCount(post.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, post));
+        }
+
+        if (dto.getHeartType() == HeartType.COMMENT) {
+            Comment comment = commentRepository.findById(dto.getId())
+                    .orElseThrow(() -> new CustomException(INVALID_COMMENT, "존재하지 않는 comment id입니다"));
+
+            comment.updateHeartCount(comment.getHeartCount() + 1);
+            heartRepository.save(dto.toEntity(member, comment));
         }
     }
 
@@ -53,6 +60,15 @@ public class HeartService {
 
             Post post = heart.getPost();
             post.updateHeartCount(post.getHeartCount() - 1);
+            heartRepository.delete(heart);
+        }
+
+        if (dto.getHeartType() == HeartType.COMMENT) {
+            Heart heart = heartRepository.findByMemberIdAndCommentId(memberId, dto.getId())
+                    .orElseThrow(() -> new CustomException(INVALID_HEART, "댓글에 대한 좋아요가 없습니다"));
+
+            Comment comment = heart.getComment();
+            comment.updateHeartCount(comment.getHeartCount() - 1);
             heartRepository.delete(heart);
         }
     }

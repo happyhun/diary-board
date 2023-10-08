@@ -16,6 +16,7 @@ public class GetCommentResponse {
     private final String author;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
+    private final Integer heartCount;
 
     public GetCommentResponse(Comment comment) {
         this.commentId = comment.getId();
@@ -23,5 +24,6 @@ public class GetCommentResponse {
         this.author = comment.getMember().getNickname();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
+        this.heartCount = comment.getHeartCount();
     }
 }
