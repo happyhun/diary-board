@@ -34,6 +34,9 @@ public class HeartService {
             Post post = postRepository.findById(dto.getId())
                     .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
+            if (heartRepository.existsByMemberIdAndPostId(memberId, dto.getId()))
+                throw new CustomException(DUPLICATED_HEART, "이미 좋아요를 누른 게시글입니다");
+
             post.updateHeartCount(post.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, post));
         }
@@ -41,6 +44,9 @@ public class HeartService {
         if (dto.getHeartType() == HeartType.COMMENT) {
             Comment comment = commentRepository.findById(dto.getId())
                     .orElseThrow(() -> new CustomException(INVALID_COMMENT, "존재하지 않는 comment id입니다"));
+
+            if (heartRepository.existsByMemberIdAndCommentId(memberId, dto.getId()))
+                throw new CustomException(DUPLICATED_HEART, "이미 좋아요를 누른 댓글입니다");
 
             comment.updateHeartCount(comment.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, comment));

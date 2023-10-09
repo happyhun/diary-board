@@ -13,4 +13,9 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
 
     @EntityGraph(attributePaths = {"member", "comment"})
     Optional<Heart> findByMemberIdAndCommentId(Long memberId, Long commentId);
+
+    boolean existsByMemberIdAndPostId(Long memberId, Long postId);
+
+    boolean existsByMemberIdAndCommentId(Long memberId, Long commentId);
+
 }
