@@ -17,13 +17,15 @@ public class GetCommentResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
     private final Integer heartCount;
+    private final Boolean isHearted;
 
-    public GetCommentResponse(Comment comment) {
+    public GetCommentResponse(Comment comment, Boolean isHearted) {
         this.commentId = comment.getId();
         this.content = comment.getContent();
         this.author = comment.getMember().getNickname();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
-        this.heartCount = comment.getHeartCount();
+        this.heartCount = comment.getHearts().size();
+        this.isHearted = isHearted;
     }
 }
