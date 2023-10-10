@@ -5,6 +5,7 @@ import com.example.diaryboard.dto.post.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
+import com.example.diaryboard.repository.HeartRepository;
 import com.example.diaryboard.repository.MemberRepository;
 import com.example.diaryboard.repository.PostRepository;
 import jakarta.annotation.PostConstruct;
@@ -29,6 +30,7 @@ public class PostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final HeartRepository heartRepository;
     private ModelMapper modelMapper;
 
     @PostConstruct
@@ -71,11 +73,18 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
+        Long memberId;
+        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser"))
+            memberId = getMemberIdFromAuthentication();
+        else {
+            memberId = 0L;
+        }
+
         List<GetCommentResponse> comments = post.getComments().stream()
-                .map(GetCommentResponse::new)
+                .map(comment -> new GetCommentResponse(comment, heartRepository.existsByMemberIdAndCommentId(memberId, comment.getId())))
                 .toList();
 
-        return new GetPostResponse(post, comments);
+        return new GetPostResponse(post, comments, heartRepository.existsByMemberIdAndPostId(memberId, postId));
     }
 
     public void updatePost(Long postId, UpdatePostRequest request) {

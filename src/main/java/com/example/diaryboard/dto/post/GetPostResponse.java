@@ -21,15 +21,17 @@ public class GetPostResponse {
     private final LocalDateTime modifiedAt;
     private final Integer heartCount;
     private final List<GetCommentResponse> comments;
+    private final Boolean isHearted;
 
-    public GetPostResponse(Post post, List<GetCommentResponse> comments) {
+    public GetPostResponse(Post post, List<GetCommentResponse> comments, Boolean isHearted) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.author = post.getMember().getNickname();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.heartCount = post.getHeartCount();
+        this.heartCount = post.getHearts().size();
         this.comments = comments;
+        this.isHearted = isHearted;
     }
 }

@@ -17,5 +17,4 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
     boolean existsByMemberIdAndPostId(Long memberId, Long postId);
 
     boolean existsByMemberIdAndCommentId(Long memberId, Long commentId);
-
 }

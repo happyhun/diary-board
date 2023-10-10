@@ -24,13 +24,11 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Builder.Default
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
-    private Integer heartCount = 0;
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Heart> hearts = new ArrayList<>();
 
-    public void updateHeartCount(Integer heartCount) {
-        this.heartCount = heartCount;
-    }
 }

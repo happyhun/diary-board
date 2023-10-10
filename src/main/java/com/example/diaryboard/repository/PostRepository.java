@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @EntityGraph(attributePaths = {"member", "comments.member"})
+    @EntityGraph(attributePaths = "member")
     Optional<Post> findById(Long id);
 
     void deleteByMemberId(Long memberId);

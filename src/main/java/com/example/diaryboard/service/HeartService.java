@@ -37,7 +37,6 @@ public class HeartService {
             if (heartRepository.existsByMemberIdAndPostId(memberId, dto.getId()))
                 throw new CustomException(DUPLICATED_HEART, "이미 좋아요를 누른 게시글입니다");
 
-            post.updateHeartCount(post.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, post));
         }
 
@@ -48,7 +47,6 @@ public class HeartService {
             if (heartRepository.existsByMemberIdAndCommentId(memberId, dto.getId()))
                 throw new CustomException(DUPLICATED_HEART, "이미 좋아요를 누른 댓글입니다");
 
-            comment.updateHeartCount(comment.getHeartCount() + 1);
             heartRepository.save(dto.toEntity(member, comment));
         }
     }
@@ -65,7 +63,6 @@ public class HeartService {
                     .orElseThrow(() -> new CustomException(INVALID_HEART, "게시글에 대한 좋아요가 없습니다"));
 
             Post post = heart.getPost();
-            post.updateHeartCount(post.getHeartCount() - 1);
             heartRepository.delete(heart);
         }
 
@@ -74,7 +71,6 @@ public class HeartService {
                     .orElseThrow(() -> new CustomException(INVALID_HEART, "댓글에 대한 좋아요가 없습니다"));
 
             Comment comment = heart.getComment();
-            comment.updateHeartCount(comment.getHeartCount() - 1);
             heartRepository.delete(heart);
         }
     }
