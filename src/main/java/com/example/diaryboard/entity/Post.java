@@ -31,4 +31,10 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Heart> hearts = new ArrayList<>();
 
+    @Builder.Default
+    private Integer heartCount = 0;
+
+    public void updateHeartCount(Integer heartCount) {
+        this.heartCount = heartCount;
+    }
 }

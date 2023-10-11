@@ -49,7 +49,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Page<GetPostPageResponse>> getPostPage(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "7") int size,
+                                                                 @RequestParam(defaultValue = "8") int size,
                                                                  @RequestParam(defaultValue = "id") SortType sortBy,
                                                                  @RequestParam(defaultValue = "desc") DirectionType direction,
                                                                  @RequestParam(defaultValue = "all") SearchType searchBy,

@@ -53,7 +53,12 @@ public class PostService {
     }
 
     private Long getMemberIdFromAuthentication() {
-        return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (name.equals("anonymousUser"))
+            return 0L;
+
+        return Long.valueOf(name);
     }
 
     public void deletePost(Long postId) {
@@ -73,18 +78,13 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(INVALID_POST, "존재하지 않는 post id입니다"));
 
-        Long memberId;
-        if (!SecurityContextHolder.getContext().getAuthentication().getName().equals("anonymousUser"))
-            memberId = getMemberIdFromAuthentication();
-        else {
-            memberId = 0L;
-        }
+        Long memberId = getMemberIdFromAuthentication();
 
         List<GetCommentResponse> comments = post.getComments().stream()
-                .map(comment -> new GetCommentResponse(comment, heartRepository.existsByMemberIdAndCommentId(memberId, comment.getId())))
+                .map(comment -> new GetCommentResponse(comment, comment.getHearts().stream().anyMatch(heart -> heart.getMember().getId().equals(memberId))))
                 .toList();
 
-        return new GetPostResponse(post, comments, heartRepository.existsByMemberIdAndPostId(memberId, postId));
+        return new GetPostResponse(post, comments, post.getHearts().stream().anyMatch(heart -> heart.getMember().getId().equals(memberId)));
     }
 
     public void updatePost(Long postId, UpdatePostRequest request) {
@@ -117,7 +117,8 @@ public class PostService {
     }
 
     private PageRequest createPageRequest(int page, int size, SortType sortBy, DirectionType direction) {
-        Sort sort = (direction == DirectionType.ASC) ? Sort.by(sortBy.name().toLowerCase()).ascending() : Sort.by(sortBy.name().toLowerCase()).descending();
+        String sortName = sortBy.name().equalsIgnoreCase("HEART") ? "heartCount" : sortBy.name().toLowerCase();
+        Sort sort = (direction == DirectionType.ASC) ? Sort.by(sortName).ascending() : Sort.by(sortName).descending();
         return PageRequest.of(page, size, sort);
     }
 }

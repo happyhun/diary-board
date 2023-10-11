@@ -4,6 +4,7 @@ import com.example.diaryboard.entity.Heart;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface HeartRepository extends JpaRepository<Heart, Long> {
@@ -17,4 +18,6 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
     boolean existsByMemberIdAndPostId(Long memberId, Long postId);
 
     boolean existsByMemberIdAndCommentId(Long memberId, Long commentId);
+
+    List<Heart> findByMemberId(Long memberId);
 }

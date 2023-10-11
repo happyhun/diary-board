@@ -1,9 +1,12 @@
 package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.member.*;
+import com.example.diaryboard.entity.Heart;
+import com.example.diaryboard.entity.HeartType;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.global.exception.CustomException;
 import com.example.diaryboard.global.jwt.JwtProvider;
+import com.example.diaryboard.repository.HeartRepository;
 import com.example.diaryboard.repository.MemberRepository;
 import com.example.diaryboard.repository.PostRepository;
 import jakarta.annotation.PostConstruct;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
 @Service
@@ -27,6 +32,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final PostRepository postRepository;
+    private final HeartRepository heartRepository;
     private ModelMapper modelMapper;
 
     @PostConstruct
@@ -117,7 +123,14 @@ public class MemberService {
 
     public void deleteMember() {
         Long memberId = getMemberIdFromAuthentication();
-        postRepository.deleteByMemberId(memberId); // 추후에 soft delete로 변경
+        postRepository.deleteByMemberId(memberId);
+        List<Heart> hearts = heartRepository.findByMemberId(memberId);
+        hearts.forEach(heart -> {
+            if (heart.getType() == HeartType.POST) {
+                heart.getPost().updateHeartCount(heart.getPost().getHeartCount() - 1);
+            }
+        });
+        heartRepository.deleteAll(hearts);
         memberRepository.deleteById(memberId);
     }
 }
