@@ -30,7 +30,7 @@ public class GetPostResponse {
         this.author = post.getMember().getNickname();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
-        this.heartCount = post.getHearts().size();
+        this.heartCount = post.getHeartCount();
         this.comments = comments;
         this.isHearted = isHearted;
     }
