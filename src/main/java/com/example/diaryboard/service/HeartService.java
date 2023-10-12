@@ -64,7 +64,7 @@ public class HeartService {
                     .orElseThrow(() -> new CustomException(INVALID_HEART, "게시글에 대한 좋아요가 없습니다"));
 
             heartRepository.delete(heart);
-            heart.getPost().updateHeartCount(heart.getPost().getHeartCount() + 1);
+            heart.getPost().updateHeartCount(heart.getPost().getHeartCount() - 1);
         }
 
         if (dto.getHeartType() == HeartType.COMMENT) {
