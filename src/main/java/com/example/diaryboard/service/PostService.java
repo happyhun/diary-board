@@ -100,19 +100,22 @@ public class PostService {
         modelMapper.map(request, post);
     }
 
-    public Page<GetPostPageResponse> getPostPage(int page, int size, SortType sortBy, DirectionType direction, SearchType searchBy, String keyword) {
-        PageRequest pageRequest = createPageRequest(page, size, sortBy, direction);
+    public Page<GetPostPageResponse> getPostPage(GetPostPageRequestParam param) {
+        PageRequest pageRequest = createPageRequest(param.getPage(), param.getSize(), param.getSortBy(), param.getDirection());
 
-        if (keyword.isEmpty()) {
-            return postRepository.findAll(pageRequest).map(GetPostPageResponse::new);
+        if (param.getKeyword().isEmpty()) {
+            return postRepository.findByCreatedAtBetween(param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
         }
 
-        return switch (searchBy) {
-            case ALL -> postRepository.findByKeyword(keyword, pageRequest).map(GetPostPageResponse::new);
+        return switch (param.getSearchBy()) {
+            case ALL ->
+                    postRepository.findByKeywordAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
             case AUTHOR ->
-                    postRepository.findByMemberNicknameContaining(keyword, pageRequest).map(GetPostPageResponse::new);
-            case TITLE -> postRepository.findByTitleContaining(keyword, pageRequest).map(GetPostPageResponse::new);
-            case CONTENT -> postRepository.findByContentContaining(keyword, pageRequest).map(GetPostPageResponse::new);
+                    postRepository.findByMemberNicknameContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+            case TITLE ->
+                    postRepository.findByTitleContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+            case CONTENT ->
+                    postRepository.findByContentContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
         };
     }
 
