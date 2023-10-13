@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,13 +100,17 @@ class PostRepositoryTest {
         Post savePost = postRepository.save(post);
 
         // when
-        Page<Post> postPage = postRepository.findByMemberNicknameContaining(
+        Page<Post> postPage = postRepository.findByMemberNicknameContainingAndCreatedAtBetween(
                 keyword,
+                LocalDateTime.of(2000, 1, 1, 0, 0, 0),
+                LocalDateTime.now(),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id")));
 
         List<Post> posts = postPage.getContent();
 
         // then
+        System.out.println(savePost.getCreatedAt());
+        System.out.println(LocalDateTime.MAX);
         assertThat(posts).hasSize(1);
         assertThat(posts.get(0).getTitle()).isEqualTo(post.getTitle());
     }
@@ -126,8 +131,10 @@ class PostRepositoryTest {
         Post savePost = postRepository.save(post);
 
         // when
-        Page<Post> postPage = postRepository.findByKeyword(
+        Page<Post> postPage = postRepository.findByKeywordAndCreatedAtBetween(
                 keyword,
+                LocalDateTime.of(2000, 1, 1, 0, 0, 0),
+                LocalDateTime.now(),
                 PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id")));
 
         List<Post> posts = postPage.getContent();
