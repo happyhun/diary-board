@@ -34,6 +34,8 @@ public class Post extends BaseTimeEntity {
     @Builder.Default
     private Integer heartCount = 0;
 
+    private String image;
+
     public void updateHeartCount(Integer heartCount) {
         this.heartCount = heartCount;
     }

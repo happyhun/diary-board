@@ -25,7 +25,7 @@ public class GetCommentResponse {
         this.author = comment.getMember().getNickname();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
-        this.heartCount = comment.getHearts().size();
+        this.heartCount = comment.getHeartCount();
         this.isHearted = isHearted;
     }
 }
