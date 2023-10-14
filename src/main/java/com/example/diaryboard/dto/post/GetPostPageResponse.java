@@ -18,6 +18,7 @@ public class GetPostPageResponse {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
     private final Integer heartCount;
+    private final String image;
 
     public GetPostPageResponse(Post post) {
         this.id = post.getId();
@@ -27,5 +28,6 @@ public class GetPostPageResponse {
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
         this.heartCount = post.getHeartCount();
+        this.image = post.getImage();
     }
 }

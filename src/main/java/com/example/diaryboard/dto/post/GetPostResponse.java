@@ -22,6 +22,7 @@ public class GetPostResponse {
     private final Integer heartCount;
     private final List<GetCommentResponse> comments;
     private final Boolean isHearted;
+    private final String image;
 
     public GetPostResponse(Post post, List<GetCommentResponse> comments, Boolean isHearted) {
         this.id = post.getId();
@@ -33,5 +34,6 @@ public class GetPostResponse {
         this.heartCount = post.getHeartCount();
         this.comments = comments;
         this.isHearted = isHearted;
+        this.image = post.getImage();
     }
 }

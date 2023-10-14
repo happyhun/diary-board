@@ -128,6 +128,8 @@ public class MemberService {
         hearts.forEach(heart -> {
             if (heart.getType() == HeartType.POST) {
                 heart.getPost().updateHeartCount(heart.getPost().getHeartCount() - 1);
+            } else {
+                heart.getComment().updateHeartCount(heart.getComment().getHeartCount() - 1);
             }
         });
         heartRepository.deleteAll(hearts);

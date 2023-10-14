@@ -2,6 +2,8 @@ package com.example.diaryboard.service;
 
 import com.example.diaryboard.dto.comment.GetCommentResponse;
 import com.example.diaryboard.dto.post.*;
+import com.example.diaryboard.entity.Comment;
+import com.example.diaryboard.entity.Heart;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.exception.CustomException;
@@ -19,7 +21,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
@@ -80,11 +85,20 @@ public class PostService {
 
         Long memberId = getMemberIdFromAuthentication();
 
-        List<GetCommentResponse> comments = post.getComments().stream()
-                .map(comment -> new GetCommentResponse(comment, comment.getHearts().stream().anyMatch(heart -> heart.getMember().getId().equals(memberId))))
+        List<Long> commentIds = post.getComments().stream()
+                .map(Comment::getId)
                 .toList();
 
-        return new GetPostResponse(post, comments, post.getHearts().stream().anyMatch(heart -> heart.getMember().getId().equals(memberId)));
+        Set<Long> likedCommentIds = heartRepository.findByMemberIdAndCommentIdIn(memberId, commentIds).stream()
+                .map(Heart::getComment)
+                .map(Comment::getId)
+                .collect(Collectors.toSet());
+
+        List<GetCommentResponse> comments = post.getComments().stream()
+                .map(comment -> new GetCommentResponse(comment, likedCommentIds.contains(comment.getId())))
+                .toList();
+
+        return new GetPostResponse(post, comments, heartRepository.existsByMemberIdAndPostId(memberId, postId));
     }
 
     public void updatePost(Long postId, UpdatePostRequest request) {
