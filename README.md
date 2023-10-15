@@ -53,7 +53,5 @@ diary-board 프로젝트의 백엔드 Repository입니다.
   - 회원 ID와 댓글 IDs를 이용해서 좋아요 컬렉션을 한 번 조회합니다.
   - 좋아요 누른 댓글 IDs만 Set으로 바꿉니다.
   - 댓글마다 contains 메소드를 이용해서 좋아요 눌렀는지 여부를 확인합니다.
-### Spring Security 6와 H2 console url 충돌
-
 ## 5. 회고
 
