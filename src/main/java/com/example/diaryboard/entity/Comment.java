@@ -14,7 +14,7 @@ import java.util.List;
 public class Comment extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue // 기본 값은 AUTO
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,6 +23,7 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
+    @Column(nullable = false)
     private String content;
 
     @Builder.Default
@@ -30,6 +31,7 @@ public class Comment extends BaseTimeEntity {
     private List<Heart> hearts = new ArrayList<>();
 
     @Builder.Default
+    @Column(nullable = false)
     private Integer heartCount = 0;
 
     public void updateContent(String content) {

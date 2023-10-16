@@ -28,9 +28,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setStatus(e.getExceptionCode().getStatus().value());
 
         ErrorResponse errorResponse = new ErrorResponse(e.getExceptionCode().getCode(), e.getMessage(), e.getDetailMessage());
-
         String result = objectMapper.writeValueAsString(errorResponse);
-
         response.getWriter().write(result);
     }
 }

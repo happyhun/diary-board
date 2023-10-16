@@ -32,7 +32,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         RequestMatcher permitAllMatcher = new OrRequestMatcher(
-                new AntPathRequestMatcher("/h2-console/**"),
                 new AntPathRequestMatcher("/api/v1/members", "POST"),
                 new AntPathRequestMatcher("/api/v1/members/login", "POST"),
                 new AntPathRequestMatcher("/api/v1/posts/**", "GET")
@@ -40,21 +39,20 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(permitAllMatcher).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/v1/members/reissue")).hasAuthority("SCOPE_REFRESH")
+                .requestMatchers("/api/v1/members/reissue").hasAuthority("SCOPE_REFRESH")
                 .anyRequest().hasAuthority("SCOPE_ACCESS")
         );
 
         http.oauth2ResourceServer(oauth2 -> oauth2
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .accessDeniedHandler(new CustomAccessDeniedHandler())
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter()))
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증되지 않은 사용자가 보호된 리소스에 접근할 때 호출
+                .accessDeniedHandler(new CustomAccessDeniedHandler()) // 인증된 사용자가 권한이 없는 리소스에 접근할 때 호출
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())) // JWT를 파싱하여 Authentication 객체로 변환
         );
 
-        http.httpBasic(AbstractHttpConfigurer::disable);
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+        http.httpBasic(AbstractHttpConfigurer::disable); // Basic 인증 방식 사용 안 함 (JWT 사용)
+        http.csrf(AbstractHttpConfigurer::disable); // CSRF 사용 안 함 (JWT 사용)
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 사용 안 함 (JWT 사용)
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource())); // CORS 설정
 
         return http.build();
     }
@@ -62,14 +60,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("*")); // TODO: 프론트 서버 배포되면 origin 변경
         configuration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정
 
         return source;
     }

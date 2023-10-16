@@ -45,10 +45,12 @@ class PostRepositoryTest {
         // given
         String title = "게시판 테스트";
         String content = "게시판테스트입니다.";
+        String image = "이미지";
 
         Post post = Post.builder()
                 .title(title)
                 .content(content)
+                .image(image)
                 .member(saveMember)
                 .build();
 
@@ -68,10 +70,12 @@ class PostRepositoryTest {
         // given
         String title = "게시판 테스트";
         String content = "게시판테스트입니다.";
+        String image = "이미지";
 
         Post post = Post.builder()
                 .title(title)
                 .content(content)
+                .image(image)
                 .member(saveMember)
                 .build();
 
@@ -89,11 +93,13 @@ class PostRepositoryTest {
         // given
         String title = "게시판 테스트";
         String content = "게시판테스트입니다.";
+        String image = "이미지";
         String keyword = "시완";
 
         Post post = Post.builder()
                 .title(title)
                 .content(content)
+                .image(image)
                 .member(saveMember)
                 .build();
 
@@ -120,11 +126,13 @@ class PostRepositoryTest {
         // given
         String title = "게시판 테스트";
         String content = "게시판테스트입니다.";
+        String image = "이미지";
         String keyword = "테스트";
 
         Post post = Post.builder()
                 .title(title)
                 .content(content)
+                .image(image)
                 .member(saveMember)
                 .build();
 

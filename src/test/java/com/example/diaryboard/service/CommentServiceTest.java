@@ -68,6 +68,7 @@ class CommentServiceTest {
         Post post = Post.builder()
                 .title("title")
                 .content("content")
+                .image("image")
                 .member(member)
                 .build();
 

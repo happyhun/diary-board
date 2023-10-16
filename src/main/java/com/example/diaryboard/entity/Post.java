@@ -20,7 +20,10 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String content;
 
     @Builder.Default
@@ -32,8 +35,10 @@ public class Post extends BaseTimeEntity {
     private List<Heart> hearts = new ArrayList<>();
 
     @Builder.Default
+    @Column(nullable = false)
     private Integer heartCount = 0;
 
+    @Column(nullable = false)
     private String image;
 
     public void updateHeartCount(Integer heartCount) {

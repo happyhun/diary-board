@@ -43,6 +43,7 @@ class HeartRepositoryTest {
         Post post = Post.builder()
                 .title("게시판 테스트")
                 .content("게시판테스트입니다.")
+                .image("이미지")
                 .member(saveMember)
                 .build();
 

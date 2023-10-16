@@ -39,9 +39,9 @@ public class MemberService {
     protected void init() {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
-                .setSkipNullEnabled(true)
-                .setFieldMatchingEnabled(true)
-                .setFieldAccessLevel(AccessLevel.PRIVATE);
+                .setSkipNullEnabled(true) // null인 필드는 매핑에서 제외
+                .setFieldMatchingEnabled(true) // 필드명이 같은 필드끼리 매핑
+                .setFieldAccessLevel(AccessLevel.PRIVATE); // private 필드에 접근 가능
     }
 
     public Long signup(SignupRequest dto) {
@@ -123,7 +123,6 @@ public class MemberService {
 
     public void deleteMember() {
         Long memberId = getMemberIdFromAuthentication();
-        postRepository.deleteByMemberId(memberId);
         List<Heart> hearts = heartRepository.findByMemberId(memberId);
         hearts.forEach(heart -> {
             if (heart.getType() == HeartType.POST) {
@@ -132,6 +131,7 @@ public class MemberService {
                 heart.getComment().updateHeartCount(heart.getComment().getHeartCount() - 1);
             }
         });
+        postRepository.deleteByMemberId(memberId);
         heartRepository.deleteAll(hearts);
         memberRepository.deleteById(memberId);
     }

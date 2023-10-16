@@ -1,8 +1,6 @@
 package com.example.diaryboard.service;
 
-import com.example.diaryboard.dto.post.CreatePostRequest;
-import com.example.diaryboard.dto.post.GetPostResponse;
-import com.example.diaryboard.dto.post.UpdatePostRequest;
+import com.example.diaryboard.dto.post.*;
 import com.example.diaryboard.entity.Member;
 import com.example.diaryboard.entity.Post;
 import com.example.diaryboard.global.jwt.JwtProvider;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -135,4 +134,21 @@ class PostServiceTest {
         assertThat(post.getContent()).isEqualTo(content);
     }
 
+    @Test
+    void 게시글_페이지_조회() {
+        // given
+        String title = "테스트용 게시글";
+        String content = "테스트용 게시글 내용입니다.";
+        String image = "테스트용 이미지.jpg";
+
+        CreatePostRequest request = new CreatePostRequest(title, content, image);
+        postService.createPost(request);
+
+        // when
+        GetPostPageRequestParam requestParam = new GetPostPageRequestParam();
+        Page<GetPostPageResponse> postPage = postService.getPostPage(requestParam);
+
+        // then
+        assertThat(postPage.getTotalElements()).isEqualTo(1);
+    }
 }

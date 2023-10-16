@@ -27,13 +27,13 @@ public class JwtConfig {
     private String secretKey;
 
     @PostConstruct
-    protected void init() {
+    protected void init() { // secretKey를 Base64로 인코딩
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        MacAlgorithm algorithm = MacAlgorithm.HS256;
+        MacAlgorithm algorithm = MacAlgorithm.HS256; // JWT 서명에 사용할 알고리즘
 
         return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(secretKey.getBytes(), algorithm.getName()))
                 .macAlgorithm(algorithm)

@@ -18,7 +18,7 @@ import static com.example.diaryboard.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional // public 메소드에만 적용됨
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -45,9 +45,9 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(INVALID_COMMENT, "존재하지 않는 comment id입니다"));
 
         Long memberId = getMemberIdFromAuthentication();
-        Member member = comment.getMember();
+        Long commentMemberId = comment.getMember().getId();
 
-        if (!member.getId().equals(memberId))
+        if (!commentMemberId.equals(memberId))
             throw new CustomException(UNAUTHORIZED_COMMENT, "삭제 권한이 없습니다");
 
         commentRepository.deleteById(commentId);
@@ -58,9 +58,9 @@ public class CommentService {
                 .orElseThrow(() -> new CustomException(INVALID_COMMENT, "존재하지 않는 comment id입니다"));
 
         Long memberId = getMemberIdFromAuthentication();
-        Member member = comment.getMember();
+        Long commentMemberId = comment.getMember().getId();
 
-        if (!member.getId().equals(memberId))
+        if (!commentMemberId.equals(memberId))
             throw new CustomException(UNAUTHORIZED_COMMENT, "수정 권한이 없습니다");
 
         comment.updateContent(dto.getContent());
