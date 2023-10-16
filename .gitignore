@@ -37,5 +37,5 @@ out/
 .vscode/
 
 ### 설정 파일 ###
-application.yml
-docker-compose.yml
+*.yml
+*.sh
