@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Message {
+public class Message { // TODO: 아직 사용되지 않는 엔터티
 
     @Id
     @GeneratedValue
@@ -25,6 +25,7 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member receiver;
 
+    @Column(nullable = false)
     private String content;
 
     @CreatedDate

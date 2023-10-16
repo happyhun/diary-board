@@ -17,21 +17,20 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
 
     private final Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-    private final String principalClaimName = JwtClaimNames.SUB;
-
     @Override
     public final AbstractAuthenticationToken convert(Jwt jwt) {
-        Collection<GrantedAuthority> authorities = this.jwtGrantedAuthoritiesConverter.convert(jwt);
+        Collection<GrantedAuthority> authorities = this.jwtGrantedAuthoritiesConverter.convert(jwt); // JWT에서 권한 정보를 추출 (scope claim)
 
         if (authorities == null) {
             authorities = new ArrayList<>();
         }
 
-        for (String authority : (List<String>) jwt.getClaim("roles")) {
+        for (String authority : (List<String>) jwt.getClaim("roles")) { // JWT에서 권한 정보를 추출 (roles claim)
             authorities.add(new SimpleGrantedAuthority("ROLE_" + authority));
         }
 
-        String principalClaimValue = jwt.getClaimAsString(this.principalClaimName);
+        String principalClaimName = JwtClaimNames.SUB;
+        String principalClaimValue = jwt.getClaimAsString(principalClaimName);
         return new JwtAuthenticationToken(jwt, authorities, principalClaimValue);
     }
 }

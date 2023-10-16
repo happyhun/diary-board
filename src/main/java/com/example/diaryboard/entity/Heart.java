@@ -24,5 +24,6 @@ public class Heart {
     private Comment comment;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private HeartType type;
 }

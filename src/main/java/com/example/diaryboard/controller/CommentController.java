@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController // @Controller + @ResponseBody (객체를 JSON 형태로 반환)
 @RequestMapping("/api/v1/comments")
-@RequiredArgsConstructor
+@RequiredArgsConstructor // final이 선언된 모든 필드를 인자로 가지는 생성자를 생성
 public class CommentController {
 
     private final CommentService commentService;
@@ -24,7 +24,7 @@ public class CommentController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/{commentId}")
+    @PatchMapping("/{commentId}") // URI 템플릿 변수를 @PathVariable 변수에 할당
     public ResponseEntity<BasicMessageResponse> updateComment(@PathVariable Long commentId, @RequestBody @Valid UpdateCommentRequest request) {
         commentService.updateComment(commentId, request);
         BasicMessageResponse response = new BasicMessageResponse("댓글 수정 성공");

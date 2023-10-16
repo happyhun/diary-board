@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -116,26 +116,29 @@ public class PostService {
 
     public Page<GetPostPageResponse> getPostPage(GetPostPageRequestParam param) {
         PageRequest pageRequest = createPageRequest(param.getPage(), param.getSize(), param.getSortBy(), param.getDirection());
+        LocalDateTime startDateTime = param.getStartDate().atStartOfDay();
+        LocalDateTime endDateTime = param.getEndDate().atTime(23, 59, 59);
 
         if (param.getKeyword().isEmpty()) {
-            return postRepository.findByCreatedAtBetween(param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+            return postRepository.findByCreatedAtBetween(startDateTime, endDateTime, pageRequest).map(GetPostPageResponse::new);
         }
 
         return switch (param.getSearchBy()) {
             case ALL ->
-                    postRepository.findByKeywordAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+                    postRepository.findByKeywordAndCreatedAtBetween(param.getKeyword(), startDateTime, endDateTime, pageRequest).map(GetPostPageResponse::new);
             case AUTHOR ->
-                    postRepository.findByMemberNicknameContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+                    postRepository.findByMemberNicknameContainingAndCreatedAtBetween(param.getKeyword(), startDateTime, endDateTime, pageRequest).map(GetPostPageResponse::new);
             case TITLE ->
-                    postRepository.findByTitleContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+                    postRepository.findByTitleContainingAndCreatedAtBetween(param.getKeyword(), startDateTime, endDateTime, pageRequest).map(GetPostPageResponse::new);
             case CONTENT ->
-                    postRepository.findByContentContainingAndCreatedAtBetween(param.getKeyword(), param.getStartDate().atStartOfDay(), param.getEndDate().atTime(23, 59, 59), pageRequest).map(GetPostPageResponse::new);
+                    postRepository.findByContentContainingAndCreatedAtBetween(param.getKeyword(), startDateTime, endDateTime, pageRequest).map(GetPostPageResponse::new);
         };
     }
 
     private PageRequest createPageRequest(int page, int size, SortType sortBy, DirectionType direction) {
         String sortName = sortBy.name().equalsIgnoreCase("HEART") ? "heartCount" : sortBy.name().toLowerCase();
         Sort sort = (direction == DirectionType.ASC) ? Sort.by(sortName).ascending() : Sort.by(sortName).descending();
+
         return PageRequest.of(page, size, sort);
     }
 }

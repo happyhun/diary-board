@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
@@ -49,18 +47,10 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<GetPostPageResponse>> getPostPage(@RequestParam(defaultValue = "0") int page,
-                                                                 @RequestParam(defaultValue = "8") int size,
-                                                                 @RequestParam(defaultValue = "id") SortType sortBy,
-                                                                 @RequestParam(defaultValue = "desc") DirectionType direction,
-                                                                 @RequestParam(defaultValue = "all") SearchType searchBy,
-                                                                 @RequestParam(defaultValue = "") String keyword,
-                                                                 @RequestParam(defaultValue = "2000-01-01") LocalDate startDate,
-                                                                 @RequestParam(defaultValue = "2099-12-31") LocalDate endDate) {
+    @GetMapping // 쿼리스트링을 객체로 받기 위해 @ModelAttribute 사용 (생략 가능)
+    public ResponseEntity<Page<GetPostPageResponse>> getPostPage(GetPostPageRequestParam requestParam) {
+        Page<GetPostPageResponse> response = postService.getPostPage(requestParam);
 
-        GetPostPageRequestParam request = new GetPostPageRequestParam(page, size, sortBy, direction, searchBy, keyword, startDate, endDate);
-        Page<GetPostPageResponse> response = postService.getPostPage(request);
         return ResponseEntity.ok().body(response);
     }
 }

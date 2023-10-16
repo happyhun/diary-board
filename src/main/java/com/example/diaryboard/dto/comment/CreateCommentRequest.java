@@ -13,9 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 프록시 객체를 만들 때만 사용하도록, 기본 생성자를 protected로 설정
+@AllArgsConstructor // 테스트를 위해 생성자를 추가
+@JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class) // JSON의 snake_case 값을 Java의 camelCase 값으로 매핑
 public class CreateCommentRequest {
 
     @NotNull
