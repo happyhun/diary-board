@@ -65,8 +65,9 @@ class PostServiceTest {
         // given
         String title = "테스트용 게시글";
         String content = "테스트용 게시글 내용입니다.";
+        String image = "테스트용 이미지.jpg";
 
-        CreatePostRequest request = new CreatePostRequest(title, content);
+        CreatePostRequest request = new CreatePostRequest(title, content, image);
 
         // when
         Long postId = postService.createPost(request);
@@ -83,8 +84,9 @@ class PostServiceTest {
         // given
         String title = "테스트용 게시글";
         String content = "테스트용 게시글 내용입니다.";
+        String image = "테스트용 이미지.jpg";
 
-        CreatePostRequest request = new CreatePostRequest(title, content);
+        CreatePostRequest request = new CreatePostRequest(title, content, image);
         Long postId = postService.createPost(request);
 
         // when
@@ -100,8 +102,9 @@ class PostServiceTest {
         // given
         String title = "테스트용 게시글";
         String content = "테스트용 게시글 내용입니다.";
+        String image = "테스트용 이미지.jpg";
 
-        CreatePostRequest request = new CreatePostRequest(title, content);
+        CreatePostRequest request = new CreatePostRequest(title, content, image);
         Long postId = postService.createPost(request);
 
         // when
@@ -116,14 +119,15 @@ class PostServiceTest {
         // given
         String title = "테스트용 게시글";
         String content = "테스트용 게시글 내용입니다.";
+        String image = "테스트용 이미지.jpg";
 
-        CreatePostRequest request = new CreatePostRequest(title, content);
+        CreatePostRequest request = new CreatePostRequest(title, content, image);
         Long postId = postService.createPost(request);
 
         String updatedTitle = "수정된 게시글";
 
         // when
-        postService.updatePost(postId, new UpdatePostRequest(updatedTitle, null));
+        postService.updatePost(postId, new UpdatePostRequest(updatedTitle, null, null));
         Post post = postRepository.findById(postId).orElseThrow();
 
         // then
