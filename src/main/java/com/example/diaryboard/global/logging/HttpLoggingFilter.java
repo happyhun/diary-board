@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -13,6 +15,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 @Component
 @Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE) // Spring Security Filter보다 먼저 실행되도록 설정
 public class HttpLoggingFilter extends OncePerRequestFilter { // OncePerRequestFilter: 요청당 한 번만 실행되는 필터
 
     @Override
