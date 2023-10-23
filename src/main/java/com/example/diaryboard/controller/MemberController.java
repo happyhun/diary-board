@@ -61,9 +61,4 @@ public class MemberController {
 
         return ResponseEntity.ok().body(response);
     }
-
-    @GetMapping("/test")
-    public Authentication test() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
 }
