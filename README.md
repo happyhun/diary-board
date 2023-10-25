@@ -40,6 +40,9 @@ diary-board 프로젝트의 백엔드 Repository입니다.
 - 게시글에 댓글과 좋아요 생성 가능
 - 댓글에 좋아요 생성 가능
 - 회원이 좋아요를 눌렀는지 확인하는 로직 구현
+### HTTP 로깅
+- Request Response에 대한 로깅 필터 구현
+- 로그를 파일로 저장하여 장애 발생시 분석 가능
 
 ## 4. 트러블 슈팅
 ### @OneToMany와 Fetch Join 문제
@@ -54,5 +57,9 @@ diary-board 프로젝트의 백엔드 Repository입니다.
   - 회원 ID와 댓글 IDs를 이용해서 좋아요 컬렉션을 한 번 조회합니다.
   - 좋아요 누른 댓글 IDs만 Set으로 바꿉니다.
   - 댓글마다 contains 메소드를 이용해서 좋아요 눌렀는지 여부를 확인합니다.
+### 로깅 필터 적용시 Request Response Body가 사라지는 문제
+- ServletRequest와 ServletResponse의 Body는 스트림이기 때문에, 한 번 읽으면 사라집니다.
+- ContentCachingRequest(Response)Wrapper를 사용해서 Body를 캐싱하면 문제가 해결됩니다.
+- 단, RequestWrapper는 캐싱된 데이터만 가지고 있으므로 copyBodyToResponse()로 실제 응답 본문에 값을 넣어주어야 합니다.
 ## 5. 회고
 
