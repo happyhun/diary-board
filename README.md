@@ -26,7 +26,7 @@ diary-board 프로젝트의 백엔드 Repository입니다.
 - SpringBoot 3.1.3
 - Spring Data JPA
 - Spring Security OAuth2 Resource Server 6.1.3
-- H2 2.1.214 (추후 MySQL로 변경 예정)
+- MySQL 8.0
 
 ## 3. 주요 기능
 ### 회원
