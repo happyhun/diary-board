@@ -14,8 +14,7 @@ diary-board 프로젝트의 백엔드 Repository입니다.
 - 매주 월요일 3시에 스프린트 회고를 합니다.  
 
 ### 개발 기간
-- 9월 4일 (월) ~ 10월 16일 (월)
-- 수시로 리팩토링 진행중 
+- 2023년 09월 04일 ~ 2023년 10월 16일
 
 ### 참고
 - [스프린트 블로그](https://philosophy-coding.tistory.com/40)  
@@ -61,5 +60,4 @@ diary-board 프로젝트의 백엔드 Repository입니다.
 - ServletRequest와 ServletResponse의 Body는 스트림이기 때문에, 한 번 읽으면 사라집니다.
 - ContentCachingRequest(Response)Wrapper를 사용해서 Body를 캐싱하면 문제가 해결됩니다.
 - 단, RequestWrapper는 캐싱된 데이터만 가지고 있으므로 copyBodyToResponse()로 실제 응답 본문에 값을 넣어주어야 합니다.
-## 5. 회고
 
