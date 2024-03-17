@@ -16,6 +16,12 @@ diary-board 프로젝트의 백엔드 Repository입니다.
 ### 개발 기간
 - 2023년 09월 04일 ~ 2023년 10월 16일
 
+### 프로젝트 페이지 뷰
+![diray-board_removed (1)_page-0001](https://github.com/happyhun/diary-board/assets/98076603/7e17e04e-7101-4850-8b69-805882a7b010)
+![diray-board_removed (1)_page-0002](https://github.com/happyhun/diary-board/assets/98076603/7c0d4939-fc7e-4773-bd26-2c4ca3f4d5ec)
+![diray-board_removed (1)_page-0003](https://github.com/happyhun/diary-board/assets/98076603/7be31e88-3bf0-4129-b136-3e649b56d3c6)
+![diray-board_removed (1)_page-0004](https://github.com/happyhun/diary-board/assets/98076603/28c5fd21-85b5-4362-9b3c-14b9cfa5bf40)
+
 ### 참고
 - [스프린트 블로그](https://philosophy-coding.tistory.com/40)  
 - [API 문서](https://dairy-board.gitbook.io/api)
