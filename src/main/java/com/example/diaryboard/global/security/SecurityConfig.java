@@ -34,12 +34,14 @@ public class SecurityConfig {
         RequestMatcher permitAllMatcher = new OrRequestMatcher(
                 new AntPathRequestMatcher("/api/v1/members", "POST"),
                 new AntPathRequestMatcher("/api/v1/members/login", "POST"),
-                new AntPathRequestMatcher("/api/v1/posts/**", "GET")
+                new AntPathRequestMatcher("/api/v1/posts/**", "GET"),
+                new AntPathRequestMatcher("/actuator/**", "GET"),
+                new AntPathRequestMatcher("/h2-console/**")
         );
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(permitAllMatcher).permitAll()
-                .requestMatchers("/api/v1/members/reissue").hasAuthority("SCOPE_REFRESH")
+                .requestMatchers(new AntPathRequestMatcher("/api/v1/members/reissue")).hasAuthority("SCOPE_REFRESH")
                 .anyRequest().hasAuthority("SCOPE_ACCESS")
         );
 
@@ -53,6 +55,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable); // CSRF 사용 안 함 (JWT 사용)
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 사용 안 함 (JWT 사용)
         http.cors(cors -> cors.configurationSource(corsConfigurationSource())); // CORS 설정
+        http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // 동일한 Origin에서만 프레임 허용
 
         return http.build();
     }
