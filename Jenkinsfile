@@ -11,6 +11,15 @@ pipeline {
     }
 
     stages {
+        stage('Check Docker Path') {
+            steps {
+                script {
+                    sh 'echo $PATH'
+                    sh 'which docker || echo "Docker not found"'
+                }
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 git branch: "${BRANCH}", url: "${REPO_URL}"
