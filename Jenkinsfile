@@ -26,15 +26,6 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                script {
-                    sh 'chmod +x gradlew'
-                    sh './gradlew clean build'
-                }
-            }
-        }
-
         stage('Test') {
             steps {
                 script {
@@ -44,6 +35,15 @@ pipeline {
             post {
                 failure {
                     error('Test stage failed. Stopping the pipeline.')
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean build'
                 }
             }
         }
