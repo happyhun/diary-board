@@ -55,7 +55,7 @@ pipeline {
                     if docker ps -q --filter "name=${DOCKER_CONTAINER}" | grep -q .; then docker stop ${DOCKER_CONTAINER} && docker rm ${DOCKER_CONTAINER}; fi
                     docker rm ${DOCKER_CONTAINER} || true
                     docker build -t ${DOCKER_IMAGE} .
-                    docker run -d -p 8080:8080 --name ${DOCKER_CONTAINER} ${DOCKER_IMAGE}
+                    docker run -d -p 8081:8080 --name ${DOCKER_CONTAINER} ${DOCKER_IMAGE}
                     """
                 }
             }
